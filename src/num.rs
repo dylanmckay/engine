@@ -1,11 +1,20 @@
 
-#![feature(int_uint)]
-
+use std;
 use std::ops::{Add,Sub,Mul,Div,Neg,Rem};
 
+/// Something that can be casted.
 pub trait Cast<T>
 {
     fn cast(self) -> T;
+}
+
+/// A number which can be casted.
+pub trait NumCast : Cast<i8>  + Cast<u8> +
+                    Cast<i16> + Cast<u16> +
+                    Cast<i32> + Cast<u32> +
+                    Cast<i64> + Cast<u64> +
+                    Cast<isize> + Cast<usize> +
+                    Cast<f32> + Cast<f64> {
 }
 
 /// A number which has an additive identity.
@@ -69,7 +78,7 @@ pub trait Decimal : Zero + One + Sized
 }
 
 /// A number which can be positive or negative.
-pub trait Signed
+pub trait Signed: Neg<Output=Self>
 {
     fn abs(self) -> Self;
 }
@@ -81,14 +90,13 @@ pub trait Unsigned { }
 pub trait Num : Zero + One +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
-                Rem<Output=Self> + Neg<Output=Self> +
-                PartialEq
+                Rem<Output=Self> + PartialEq
 {
 
 }
 
 /// A primitive number.
-pub trait Primitive: Copy + Clone + Num + std::num::NumCast + PartialOrd
+pub trait Primitive: Copy + Clone + Num + NumCast + PartialOrd
 {
 
 }
@@ -96,8 +104,37 @@ pub trait Primitive: Copy + Clone + Num + std::num::NumCast + PartialOrd
 /// A number which has an upper and lower bound.
 pub trait Bounded
 {
-    fn min_value() -> Self;
-    fn max_value() -> Self;
+    fn min() -> Self;
+    fn max() -> Self;
+}
+
+macro_rules! impl_cast {
+    ($ty:ident, $to:ident) => {
+        impl Cast<$to> for $ty {
+            fn cast(self) -> $to {
+                self as $to
+            }
+        }
+    }
+}
+
+macro_rules! impl_numcast {
+    ($ty:ident) => {
+        impl NumCast for $ty { }
+
+        impl_cast!($ty, i8);
+        impl_cast!($ty, u8);
+        impl_cast!($ty, i16);
+        impl_cast!($ty, u16);
+        impl_cast!($ty, i32);
+        impl_cast!($ty, u32);
+        impl_cast!($ty, i64);
+        impl_cast!($ty, u64);
+        impl_cast!($ty, usize);
+        impl_cast!($ty, isize);
+        impl_cast!($ty, f32);
+        impl_cast!($ty, f64);
+    }
 }
 
 /// Implements the `Zero` and `One` traits on a type.
@@ -127,43 +164,43 @@ macro_rules! impl_decimal {
         impl Decimal for $ty
         {
             fn pi() -> $ty { ::std::$ty::consts::PI }
-            fn tau() -> $ty { ::std::$ty::consts::PI_2 }
+            fn tau() -> $ty { ::std::$ty::consts::PI * 2.0}
             fn e() -> $ty { ::std::$ty::consts::E }
             
-            fn floor(self) -> $ty { ::std::num::Float::floor(self) }
-            fn ceil(self) -> $ty { ::std::num::Float::ceil(self) }
-            fn round(self) -> $ty { ::std::num::Float::round(self) }
-            fn trunc(self) -> $ty { ::std::num::Float::trunc(self) }
-            fn recip(self) -> $ty { ::std::num::Float::recip(self) }
-            fn powi(self, n: i32) -> $ty { ::std::num::Float::powi(self, n) }
-            fn powf(self, n: Self) -> $ty { ::std::num::Float::powf(self, n) }
-            fn sqrt(self) -> $ty { ::std::num::Float::sqrt(self) }
-            fn rsqrt(self) -> $ty { ::std::num::Float::rsqrt(self) }
-            fn cbrt(self) -> $ty { ::std::num::Float::cbrt(self) }
-            fn sin(self) -> $ty { ::std::num::Float::sin(self) }
-            fn cos(self) -> $ty { ::std::num::Float::cos(self) }
-            fn tan(self) -> $ty { ::std::num::Float::tan(self) }
-            fn asin(self) -> $ty { ::std::num::Float::asin(self) }
-            fn acos(self) -> $ty { ::std::num::Float::acos(self) }
-            fn atan(self) -> $ty { ::std::num::Float::atan(self) }
-            fn atan2(self, other: Self) -> $ty { ::std::num::Float::atan2(self, other) }
-            fn sinh(self) -> $ty { ::std::num::Float::sinh(self) }
-            fn cosh(self) -> $ty { ::std::num::Float::cosh(self) }
-            fn tanh(self) -> $ty { ::std::num::Float::tanh(self) }
-            fn asinh(self) -> $ty { ::std::num::Float::asinh(self) }
-            fn acosh(self) -> $ty { ::std::num::Float::acosh(self) }
-            fn atanh(self) -> $ty { ::std::num::Float::atanh(self) }
+            fn floor(self) -> $ty { $ty::floor(self) }
+            fn ceil(self) -> $ty { $ty::ceil(self) }
+            fn round(self) -> $ty { $ty::round(self) }
+            fn trunc(self) -> $ty { $ty::trunc(self) }
+            fn recip(self) -> $ty { $ty::recip(self) }
+            fn powi(self, n: i32) -> $ty { $ty::powi(self, n) }
+            fn powf(self, n: Self) -> $ty { $ty::powf(self, n) }
+            fn sqrt(self) -> $ty { $ty::sqrt(self) }
+            fn rsqrt(self) -> $ty { $ty::rsqrt(self) }
+            fn cbrt(self) -> $ty { $ty::cbrt(self) }
+            fn sin(self) -> $ty { $ty::sin(self) }
+            fn cos(self) -> $ty { $ty::cos(self) }
+            fn tan(self) -> $ty { $ty::tan(self) }
+            fn asin(self) -> $ty { $ty::asin(self) }
+            fn acos(self) -> $ty { $ty::acos(self) }
+            fn atan(self) -> $ty { $ty::atan(self) }
+            fn atan2(self, other: Self) -> $ty { $ty::atan2(self, other) }
+            fn sinh(self) -> $ty { $ty::sinh(self) }
+            fn cosh(self) -> $ty { $ty::cosh(self) }
+            fn tanh(self) -> $ty { $ty::tanh(self) }
+            fn asinh(self) -> $ty { $ty::asinh(self) }
+            fn acosh(self) -> $ty { $ty::acosh(self) }
+            fn atanh(self) -> $ty { $ty::atanh(self) }
             
             fn root(self, n: Self) -> $ty
             {
                 self.powf(n.recip())
             }
             
-            fn exp(self) -> $ty { ::std::num::Float::exp(self) }
-            fn log(self, base: Self) -> $ty { ::std::num::Float::log(self, base) }
+            fn exp(self) -> $ty { $ty::exp(self) }
+            fn log(self, base: Self) -> $ty { $ty::log(self, base) }
             
-            fn to_degrees(self) -> $ty { ::std::num::Float::to_degrees(self) }
-            fn to_radians(self) -> $ty { ::std::num::Float::to_radians(self) }
+            fn to_degrees(self) -> $ty { $ty::to_degrees(self) }
+            fn to_radians(self) -> $ty { $ty::to_radians(self) }
         }
     }
 }
@@ -175,9 +212,7 @@ macro_rules! impl_signed {
         {
             fn abs(self) -> $ty
             {
-                use std;
-                
-                std::num::$t::abs(self)
+                $ty::abs(self)
             }
         }
     }
@@ -210,19 +245,34 @@ macro_rules! impl_bounded {
     }
 }
 
+impl_numcast!(u8);
+impl_numcast!(u16);
+impl_numcast!(u32);
+impl_numcast!(u64);
+impl_numcast!(usize);
+
+impl_numcast!(i8);
+impl_numcast!(i16);
+impl_numcast!(i32);
+impl_numcast!(i64);
+impl_numcast!(isize);
+
+impl_numcast!(f32);
+impl_numcast!(f64);
+
 // implement Zero + One for unsigned integral types
 impl_zero_one!(u8,   0, 1);
 impl_zero_one!(u16,  0, 1);
 impl_zero_one!(u32,  0, 1);
 impl_zero_one!(u64,  0, 1);
-impl_zero_one!(uint, 0, 1);
+impl_zero_one!(usize, 0, 1);
 
 // implement Zero + One for signed integral types
 impl_zero_one!(i8,   0, 1);
 impl_zero_one!(i16,  0, 1);
 impl_zero_one!(i32,  0, 1);
 impl_zero_one!(i64,  0, 1);
-impl_zero_one!(int,  0, 1);
+impl_zero_one!(isize,  0, 1);
 
 // implement Zero + One for floating point types
 impl_zero_one!(f32,  0.0, 1.0);
@@ -233,14 +283,14 @@ impl_integer!(u8);
 impl_integer!(u16);
 impl_integer!(u32);
 impl_integer!(u64);
-impl_integer!(uint);
+impl_integer!(usize);
 
 // implement Integer for signed integer types
 impl_integer!(i8);
 impl_integer!(i16);
 impl_integer!(i32);
 impl_integer!(i64);
-impl_integer!(int);
+impl_integer!(isize);
 
 // implement Decimal for floating point types
 impl_decimal!(f32);
@@ -251,7 +301,7 @@ impl_signed!(i8,  SignedInt);
 impl_signed!(i16, SignedInt);
 impl_signed!(i32, SignedInt);
 impl_signed!(i64, SignedInt);
-impl_signed!(int, SignedInt);
+impl_signed!(isize, SignedInt);
 
 // implement Signed for floating point types
 impl_signed!(f32, Float);
@@ -262,49 +312,49 @@ impl_unsigned!(u8);
 impl_unsigned!(u16);
 impl_unsigned!(u32);
 impl_unsigned!(u64);
-impl_unsigned!(uint);
+impl_unsigned!(usize);
 
 // implement Num + Primitive for unsigned integral types
 impl_num_primitive!(u8);
 impl_num_primitive!(u16);
 impl_num_primitive!(u32);
 impl_num_primitive!(u64);
-impl_num_primitive!(uint);
+impl_num_primitive!(usize);
 
 // implement Num + Primitive for signed integral types
 impl_num_primitive!(i8);
 impl_num_primitive!(i16);
 impl_num_primitive!(i32);
 impl_num_primitive!(i64);
-impl_num_primitive!(int);
+impl_num_primitive!(isize);
 
 // implement Num + Primitive for floating point types
 impl_num_primitive!(f32);
 impl_num_primitive!(f64);
 
 // implement Bounded for unsigned integral types
-impl_bounded!(u8,   std::u8::MIN,   std::u8::MAX);
-impl_bounded!(u16,  std::u16::MIN,  std::u16::MAX);
-impl_bounded!(u32,  std::u32::MIN,  std::u32::MAX);
-impl_bounded!(u64,  std::u64::MIN,  std::u64::MAX);
-impl_bounded!(uint, std::uint::MIN, std::uint::MAX);
+impl_bounded!(u8,    std::u8::MIN,    std::u8::MAX);
+impl_bounded!(u16,   std::u16::MIN,   std::u16::MAX);
+impl_bounded!(u32,   std::u32::MIN,   std::u32::MAX);
+impl_bounded!(u64,   std::u64::MIN,   std::u64::MAX);
+impl_bounded!(usize, std::usize::MIN, std::usize::MAX);
 
 // implement Bounded for signed integral types
-impl_bounded!(i8,   std::i8::MIN,   std::i8::MAX);
-impl_bounded!(i16,  std::i16::MIN,  std::i16::MAX);
-impl_bounded!(i32,  std::i32::MIN,  std::i32::MAX);
-impl_bounded!(i64,  std::i64::MIN,  std::i64::MAX);
-impl_bounded!(int,  std::int::MIN,  std::int::MAX);
+impl_bounded!(i8,    std::i8::MIN,    std::i8::MAX);
+impl_bounded!(i16,   std::i16::MIN,   std::i16::MAX);
+impl_bounded!(i32,   std::i32::MIN,   std::i32::MAX);
+impl_bounded!(i64,   std::i64::MIN,   std::i64::MAX);
+impl_bounded!(isize, std::isize::MIN, std::isize::MAX);
 
 // implement Bounded for floating point types
 impl_bounded!(f32, std::f32::MIN, std::f32::MAX);
 impl_bounded!(f64, std::f64::MIN, std::f64::MAX);
 
 /// Casts a number from one type to another.
-pub fn cast<T: std::num::NumCast, U: std::num::NumCast>(n: T) -> U
+/*pub fn cast<T: std::num::NumCast, U: std::num::NumCast>(n: T) -> U
 {
     std::num::cast(n).unwrap()
-}
+}*/
 
 pub fn zero<T: Zero>() -> T
 {
@@ -318,12 +368,12 @@ pub fn one<T: One>() -> T
 
 pub fn max<T: Bounded>() -> T
 {
-    Bounded::max_value()
+    Bounded::max()
 }
 
 pub fn min<T: Bounded>() -> T
 {
-    Bounded::min_value()
+    Bounded::min()
 }
 
 
