@@ -31,10 +31,16 @@ pub trait One: Mul<Output=Self>
 }
 
 /// A number which is an integer.
-pub trait Integer : Zero + One { }
+pub trait Integer : Zero + One + Bounded + Copy + Clone +
+                    Add<Output=Self> + Sub<Output=Self> +
+                    Mul<Output=Self> + Div<Output=Self> +
+                    Rem<Output=Self> + PartialEq {}
 
 /// A decimal number.
-pub trait Decimal : Zero + One + Sized
+pub trait Decimal : Zero + One + Sized + Bounded + Copy + Clone +
+                    Add<Output=Self> + Sub<Output=Self> +
+                    Mul<Output=Self> + Div<Output=Self> +
+                    Rem<Output=Self> + PartialEq
 {
     // constants
     fn pi() -> Self;
@@ -87,7 +93,7 @@ pub trait Signed: Neg<Output=Self>
 pub trait Unsigned { }
 
 /// A generalised number.
-pub trait Num : Zero + One +
+pub trait Num : Zero + One + Bounded +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
                 Rem<Output=Self> + PartialEq
@@ -351,10 +357,10 @@ impl_bounded!(f32, std::f32::MIN, std::f32::MAX);
 impl_bounded!(f64, std::f64::MIN, std::f64::MAX);
 
 /// Casts a number from one type to another.
-/*pub fn cast<T: std::num::NumCast, U: std::num::NumCast>(n: T) -> U
+pub fn cast<T, U: Cast<T>>(n: U) -> T
 {
-    std::num::cast(n).unwrap()
-}*/
+    n.cast()
+}
 
 pub fn zero<T: Zero>() -> T
 {
