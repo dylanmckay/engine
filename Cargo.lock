@@ -4,6 +4,7 @@ version = "0.0.1"
 dependencies = [
  "gl 0.0.12 (git+https://github.com/bjz/gl-rs)",
  "glfw 0.1.0 (git+https://github.com/bjz/glfw-rs.git)",
+ "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

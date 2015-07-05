@@ -8,6 +8,9 @@ pub use self::backends::Backend;
 
 pub mod device;
 pub mod canvas;
+pub mod shader;
+pub mod mesh;
 
 pub mod backends;
 pub mod state;
+
