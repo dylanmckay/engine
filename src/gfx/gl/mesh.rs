@@ -1,6 +1,7 @@
 
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
+use geom;
 use libc::types::common::c95::c_void;
 use std::mem;
 
@@ -29,6 +30,30 @@ impl Buffer
         }
     }
 
+    pub unsafe fn load_data_raw(self,
+                                target: GLenum, ptr: *const c_void,
+                                size: GLsizeiptr, usage: GLenum) -> Self {
+        self.bind(target);
+        gl::BufferData(target, size, ptr, usage);
+
+        self.unbind(target);
+
+        self
+    }
+
+    pub fn load_data<T>(self, target: GLenum, data: &[T], usage: GLenum) -> Self {
+        let ptr = data.as_ptr() as *const c_void;
+        let size = mem::size_of::<T>() * data.len();
+
+        unsafe {
+            self.load_data_raw(target, ptr, size as GLsizeiptr, usage)
+        }
+    }
+
+    pub fn load<T>(self, target: GLenum, buffer: &geom::mesh::Buffer<T>, usage: GLenum) -> Self {
+        self.load_data(target, &buffer.buffer, usage)
+    }
+
     pub fn bind(&self, target: GLenum) {
         unsafe {
             gl::BindBuffer(target, self.buffer);
@@ -41,36 +66,49 @@ impl Buffer
         }
     }
 
-    pub unsafe fn load_raw(&self,
-                           target: GLenum, ptr: *const c_void,
-                           size: GLsizeiptr, usage: GLenum)  {
-        self.bind(target);
-        gl::BufferData(target, size, ptr, usage);
+}
 
-        self.unbind(target);
+/// A collection of buffers, representing one set of data.
+pub struct Data
+{
+    buffers: Vec<Buffer>,
+}
+
+impl Data
+{
+    pub fn new() -> Self {
+        Data {
+            buffers: Vec::new(),
+        }
     }
 
-    pub fn load<T>(&self, target: GLenum, data: &[T], usage: GLenum) {
-        let ptr = data.as_ptr() as *const c_void;
-        let size = mem::size_of::<T>() * data.len();
-
-        unsafe {
-            self.load_raw(target, ptr, size as GLsizeiptr, usage);
-        }
+    pub fn load<T>(mut self, target: GLenum, data: &geom::mesh::Data<T>, usage: GLenum) -> Self {
+        self.buffers.extend(data.buffers()
+                                .map(|b| Buffer::new().load(target, b, usage)));
+        self
     }
 }
 
+/// A geometric mesh loaded into memory.
 pub struct Mesh
 {
-    buffers: Vec<Buffer>,
+    indices: Data,
+    vertices: Data,
 }
 
 impl Mesh
 {
     pub fn new() -> Self {
         Mesh {
-            buffers: Vec::new(),
+            indices: Data::new(),
+            vertices: Data::new(),
         }
+    }
+
+    pub fn load<I,V>(mut self, mesh: &geom::Mesh<I,V>) -> Mesh {
+        self.indices = self.indices.load(gl::ELEMENT_ARRAY_BUFFER, &mesh.indices, gl::STATIC_DRAW);
+        self.vertices = self.vertices.load(gl::ARRAY_BUFFER, &mesh.vertices, gl::STATIC_DRAW);
+        self
     }
 
 }

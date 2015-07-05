@@ -1,5 +1,6 @@
 
 use gfx::gl::{self};
+use geom;
 
 pub struct Device<B: gl::Backend>
 {
@@ -28,6 +29,10 @@ impl<B: gl::Backend> Device<B>
 
     pub fn end(&mut self) {
         self.backend.end()
+    }
+
+    pub fn load_mesh<I,V>(&mut self, mesh: &geom::Mesh<I,V>) -> gl::Mesh {
+        gl::Mesh::new().load(mesh)
     }
 }
 

@@ -140,4 +140,16 @@ impl Program
             Err(s)
         }
     }
+
+    pub fn enable(&self) {
+        unsafe {
+            gl::UseProgram(self.program);
+        }
+    }
+
+    pub fn disable(&self) {
+        unsafe {
+            gl::UseProgram(0);
+        }
+    }
 }

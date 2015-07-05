@@ -1,4 +1,6 @@
 
+use std;
+
 const DEFAULT_BUFFER_SIZE: usize = 4096;
 
 /// A hardware buffer.
@@ -45,6 +47,10 @@ impl<T> Data<T>
 
     pub fn empty() -> Self {
         Data::new(Vec::new())
+    }
+
+    pub fn buffers<'a>(&'a self) -> std::slice::Iter<'a, Buffer<T>> {
+        self.buffers.iter()
     }
 }
 

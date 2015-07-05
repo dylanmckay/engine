@@ -1,4 +1,5 @@
 
+use gfx;
 use gfx::gl::gl;
 use color::NormalizedRGBA;
 
@@ -15,6 +16,12 @@ impl Canvas
     pub fn clear(&self) {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
+        }
+    }
+
+    pub fn draw_mesh(&self, mesh: &gfx::gl::Mesh, program: &gfx::gl::Program) {
+        unsafe {
+            gl::EnableVertexAttribArray(0);
         }
     }
 }
