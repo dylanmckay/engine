@@ -1,8 +1,8 @@
 
 #![feature(float_extras)]
-#![feature(cstr_to_str)]
 
 extern crate libc;
+extern crate gl as libgl;
 
 pub mod num;
 pub mod math;
@@ -29,7 +29,7 @@ fn main() {
     use std;
 
     let file = std::fs::File::open(OBJ_PATH).unwrap();
-    let mesh_data: geom::Mesh<Index,Vertex> = geom::formats::Wavefront::load(file);
+    let mesh_data: geom::mesh::Data<Index,Vertex> = geom::formats::Wavefront::load(file);
 
     let backend = gfx::gl::backends::glfw::Backend::new();
     let mut device = gfx::gl::Device::new(backend);
@@ -43,7 +43,7 @@ fn main() {
     let shaders = std::iter::once(shader);
     let program = gfx::gl::shader::Program::link(shaders).unwrap();
 
-    let mesh = device.load_mesh(&mesh_data);
+    let mesh = device.load_mesh_data(&mesh_data);
 
     while device.is_open() {
         device.run();

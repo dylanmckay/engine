@@ -1,5 +1,6 @@
 
 use gfx::gl::{self};
+use libgl;
 use geom;
 
 pub struct Device<B: gl::Backend>
@@ -31,8 +32,8 @@ impl<B: gl::Backend> Device<B>
         self.backend.end()
     }
 
-    pub fn load_mesh<I,V>(&mut self, mesh: &geom::Mesh<I,V>) -> gl::Mesh {
-        gl::Mesh::new().load(mesh)
+    pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::Data<I,V>) -> gl::mesh::Data {
+        gl::mesh::Data::new().load(data, libgl::STATIC_DRAW)
     }
 }
 

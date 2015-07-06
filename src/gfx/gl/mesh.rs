@@ -7,62 +7,96 @@ use std::mem;
 
 pub struct Buffer
 {
-    buffer: GLuint,
+    index_buffer: GLuint,
+    vertex_buffer: GLuint,
 }
 
 impl Buffer
 {
-    pub fn from_buffer(buffer: GLuint) -> Buffer {
+    pub unsafe fn from_raw(index_buffer: GLuint,
+                           vertex_buffer: GLuint) -> Buffer {
         Buffer {
-            buffer: buffer,
+            index_buffer: index_buffer,
+            vertex_buffer: vertex_buffer,
         }
     }
 
     pub fn new() -> Self {
-        let mut buffer = 0;
+        let mut buffers: [GLuint; 2] = unsafe {mem::uninitialized() };
 
         unsafe {
-            gl::GenBuffers(1, &mut buffer);
+            gl::GenBuffers(2, buffers.as_mut_ptr());
         }
 
-        Buffer {
-            buffer: buffer,
+        unsafe {
+            Buffer::from_raw(buffers[0], buffers[1])
         }
     }
 
-    pub unsafe fn load_data_raw(self,
-                                target: GLenum, ptr: *const c_void,
-                                size: GLsizeiptr, usage: GLenum) -> Self {
-        self.bind(target);
-        gl::BufferData(target, size, ptr, usage);
-
-        self.unbind(target);
+    pub unsafe fn load_index_data_raw(self,
+                                      ptr: *const c_void,
+                                      size: GLsizeiptr, usage: GLenum) -> Self {
+        self.bind_indices();
+        gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, size, ptr, usage);
+        self.unbind_indices();
 
         self
     }
 
-    pub fn load_data<T>(self, target: GLenum, data: &[T], usage: GLenum) -> Self {
+    pub unsafe fn load_vertex_data_raw(self,
+                                       ptr: *const c_void,
+                                       size: GLsizeiptr, usage: GLenum) -> Self {
+        self.bind_vertices();
+        gl::BufferData(gl::ARRAY_BUFFER, size, ptr, usage);
+        self.unbind_vertices();
+
+        self
+    }
+
+    pub fn load_index_data<T>(self, data: &[T], usage: GLenum) -> Self {
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
 
         unsafe {
-            self.load_data_raw(target, ptr, size as GLsizeiptr, usage)
+            self.load_index_data_raw(ptr, size as GLsizeiptr, usage)
+        }
+    }
+    
+    pub fn load_vertex_data<T>(self, data: &[T], usage: GLenum) -> Self {
+        let ptr = data.as_ptr() as *const c_void;
+        let size = mem::size_of::<T>() * data.len();
+
+        unsafe {
+            self.load_vertex_data_raw(ptr, size as GLsizeiptr, usage)
         }
     }
 
-    pub fn load<T>(self, target: GLenum, buffer: &geom::mesh::Buffer<T>, usage: GLenum) -> Self {
-        self.load_data(target, &buffer.buffer, usage)
+    pub fn load<I,V>(self, buffer: &geom::mesh::Buffer<I,V>, usage: GLenum) -> Self {
+        self.load_index_data(&buffer.indices, usage)
+            .load_vertex_data(&buffer.vertices, usage)
     }
 
-    pub fn bind(&self, target: GLenum) {
+    pub fn bind_indices(&self) {
         unsafe {
-            gl::BindBuffer(target, self.buffer);
+            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.index_buffer);
         }
     }
 
-    pub fn unbind(&self, target: GLenum) {
+    pub fn bind_vertices(&self) {
         unsafe {
-            gl::BindBuffer(target, 0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_buffer);
+        }
+    }
+
+    pub fn unbind_indices(&self) {
+        unsafe {
+            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.index_buffer);
+        }
+    }
+
+    pub fn unbind_vertices(&self) {
+        unsafe {
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
         }
     }
 
@@ -82,33 +116,10 @@ impl Data
         }
     }
 
-    pub fn load<T>(mut self, target: GLenum, data: &geom::mesh::Data<T>, usage: GLenum) -> Self {
+    pub fn load<I,V>(mut self, data: &geom::mesh::Data<I,V>, usage: GLenum) -> Self {
         self.buffers.extend(data.buffers()
-                                .map(|b| Buffer::new().load(target, b, usage)));
+                                .map(|b| Buffer::new().load(b, usage)));
         self
     }
 }
 
-/// A geometric mesh loaded into memory.
-pub struct Mesh
-{
-    indices: Data,
-    vertices: Data,
-}
-
-impl Mesh
-{
-    pub fn new() -> Self {
-        Mesh {
-            indices: Data::new(),
-            vertices: Data::new(),
-        }
-    }
-
-    pub fn load<I,V>(mut self, mesh: &geom::Mesh<I,V>) -> Mesh {
-        self.indices = self.indices.load(gl::ELEMENT_ARRAY_BUFFER, &mesh.indices, gl::STATIC_DRAW);
-        self.vertices = self.vertices.load(gl::ARRAY_BUFFER, &mesh.vertices, gl::STATIC_DRAW);
-        self
-    }
-
-}

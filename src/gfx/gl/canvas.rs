@@ -19,9 +19,10 @@ impl Canvas
         }
     }
 
-    pub fn draw_mesh(&self, mesh: &gfx::gl::Mesh, program: &gfx::gl::Program) {
+    pub fn draw_mesh(&self, mesh: &gfx::gl::mesh::Data, program: &gfx::gl::Program) {
         unsafe {
             gl::EnableVertexAttribArray(0);
+
         }
     }
 }

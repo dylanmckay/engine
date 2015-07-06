@@ -14,7 +14,7 @@ pub trait Format<I, V>
         where R: io::Read;
 
     /// Loads the geometry and returns it as a mesh.
-    fn load<R>(read: R) -> mesh::Mesh<I,V>
+    fn load<R>(read: R) -> mesh::Data<I,V>
         where R: io::Read {
         let mut builder = mesh::Builder::new();
 

@@ -3,45 +3,45 @@ use std;
 
 const DEFAULT_BUFFER_SIZE: usize = 4096;
 
-/// A hardware buffer.
-pub struct Buffer<T>
+/// A mesh buffer.
+pub struct Buffer<I,V>
 {
-    pub buffer: Vec<T>,
+    pub indices: Vec<I>,
+    pub vertices: Vec<V>,
 }
 
-impl<T> Buffer<T>
+impl<I,V> Buffer<I,V>
 {
-    pub fn new(buffer: Vec<T>) -> Self {
+    pub fn new(indices: Vec<I>, vertices: Vec<V>) -> Self {
         Buffer {
-            buffer: buffer,
+            indices: indices,
+            vertices: vertices,
         }
     }
 
     pub fn empty() -> Self {
-        Buffer::new(Vec::new())
+        Buffer::new(Vec::new(), Vec::new())
     }
 }
 
-impl<T> From<Vec<T>> for Buffer<T>
+impl<I,V> Default for Buffer<I,V>
 {
-    fn from(buffer: Vec<T>) -> Self {
-        Buffer {
-            buffer: buffer,
-        }
+    fn default() -> Self {
+        Self::empty()
     }
 }
 
-/// A set of hardware buffers.
-pub struct Data<T>
+/// A set of mesh buffers.
+pub struct Data<I,V>
 {
-    pub buffers: Vec<Buffer<T>>,
+    pub data: Vec<Buffer<I,V>>,
 }
 
-impl<T> Data<T>
+impl<I,V> Data<I,V>
 {
-    pub fn new(buffers: Vec<Buffer<T>>) -> Self {
+    pub fn new(data: Vec<Buffer<I,V>>) -> Self {
         Data {
-            buffers: buffers,
+            data: data,
         }
     }
 
@@ -49,44 +49,15 @@ impl<T> Data<T>
         Data::new(Vec::new())
     }
 
-    pub fn buffers<'a>(&'a self) -> std::slice::Iter<'a, Buffer<T>> {
-        self.buffers.iter()
+    pub fn buffers<'a>(&'a self) -> std::slice::Iter<'a, Buffer<I,V>> {
+        self.data.iter()
     }
 }
 
-impl<T> From<Vec<T>> for Data<T>
+impl<I,V> Default for Data<I,V>
 {
-    fn from(data: Vec<T>) -> Self {
-
-        let buffer: Buffer<T> = data.into();
-        
-        let mut buffers = Vec::new();
-        buffers.push(buffer);
-
-        Data {
-            buffers: buffers,
-        }
-    }
-}
-
-/// A mesh.
-pub struct Mesh<I, V>
-{
-    pub indices: Data<I>,
-    pub vertices: Data<V>,
-}
-
-impl<I,V> Mesh<I,V>
-{
-    pub fn new(indices: Data<I>, vertices: Data<V>) -> Self {
-        Mesh {
-            indices: indices,
-            vertices: vertices,
-        }
-    }
-
-    pub fn empty() -> Self {
-        Mesh::new(Data::empty(), Data::empty())
+    fn default() -> Self {
+        Self::empty()
     }
 }
 
@@ -128,12 +99,13 @@ impl<I,V> Builder<I,V>
     }
 }
 
-impl<I, V> Into<Mesh<I,V>> for Builder<I,V>
+impl<I,V> Into<Data<I,V>> for Builder<I,V>
 {
-    fn into(self) -> Mesh<I,V> {
-        let indices = self.indices.into();
-        let vertices = self.vertices.into();
+    fn into(self) -> Data<I,V> {
+        let buffer = Buffer::new(self.indices, self.vertices);
+        let data = Data::new(vec![buffer]);
 
-        Mesh::new(indices, vertices)
+        data
+        
     }
 }
