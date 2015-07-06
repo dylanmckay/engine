@@ -34,13 +34,13 @@ pub trait One: Mul<Output=Self>
 pub trait Integer : Zero + One + Bounded + Copy + Clone +
                     Add<Output=Self> + Sub<Output=Self> +
                     Mul<Output=Self> + Div<Output=Self> +
-                    Rem<Output=Self> + PartialEq {}
+                    Rem<Output=Self> + PartialEq + NumCast {}
 
 /// A decimal number.
 pub trait Decimal : Zero + One + Sized + Bounded + Copy + Clone +
                     Add<Output=Self> + Sub<Output=Self> +
                     Mul<Output=Self> + Div<Output=Self> +
-                    Rem<Output=Self> + PartialEq
+                    Rem<Output=Self> + PartialEq + NumCast
 {
     // constants
     fn pi() -> Self;
@@ -96,7 +96,7 @@ pub trait Unsigned { }
 pub trait Num : Zero + One + Bounded +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
-                Rem<Output=Self> + PartialEq
+                Rem<Output=Self> + PartialEq + NumCast
 {
 
 }

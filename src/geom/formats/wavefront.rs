@@ -1,8 +1,9 @@
 
 use math::{Scalar,Vector3};
-use geom::{mesh,Format};
+use geom::{self,mesh,Format};
+use num;
 
-use std::io;
+use std::{self,io};
 
 // TODO: parse VertexTextureCoords
 // TODO: handle triangularisation
@@ -13,6 +14,23 @@ pub struct Vertex
     pub position: Vector3,
     pub normal: Option<Vector3>,
     pub uv: Option<(Scalar,Scalar)>,
+}
+
+pub type Face = Vec<(i32,i32,i32)>;
+
+impl geom::Face for Face
+{
+    type Vertex = (i32,i32,i32);
+    fn vertices<'a>(&'a self) -> std::slice::Iter<'a, (i32,i32,i32)> {
+        self.iter()
+    }
+}
+
+impl geom::Vertex<Scalar> for Vertex
+{
+    fn coords(self) -> (Scalar,Scalar,Scalar) {
+        self.position.into()
+    }
 }
 
 impl Vertex
@@ -31,7 +49,8 @@ impl Vertex
 pub struct Wavefront;
 
 impl<I,V> Format<I,V> for Wavefront
-    where V: From<Vertex>
+    where I: num::Integer,
+          V: From<Vertex>
 {
     fn load_with_builder<R>(read: R, builder: &mut mesh::Builder<I,V>)
         where R: io::Read {
@@ -42,7 +61,7 @@ impl<I,V> Format<I,V> for Wavefront
         let mut points = Vec::new();
         let mut normals =Vec::new();
         let mut uvs = Vec::new();
-        let mut face_indices: Vec<Vec<(i32,i32,i32)>> = Vec::new();
+        let mut face_indices: Vec<Face> = Vec::new();
 
         // We find the pairs of position/normal/uv vertices and group
         // them into here. Note that `-1` is considered an unspecified value.
@@ -112,7 +131,7 @@ impl<I,V> Format<I,V> for Wavefront
 
         }).collect();
 
-        let vertices: Vec<Vertex> = vertex_index_map.into_iter().map(|((_,_,_),v)| v).collect();
+        let vertices: Vec<V> = vertex_index_map.into_iter().map(|((_,_,_),v)| v.into()).collect();
 
     }
 }

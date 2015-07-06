@@ -68,6 +68,15 @@ impl<T: Primitive> std::iter::FromIterator<T> for Vector3<T>
     }
 }
 
+impl<T: Primitive> Into<(T,T,T)> for Vector3<T>
+{
+    fn into(self) -> (T,T,T) {
+        let Vector3(x,y,z) = self;
+
+        (x,y,z)
+    }
+}
+
 impl<T: Primitive> ops::Add for Vector3<T>
 {
     type Output = Self;
