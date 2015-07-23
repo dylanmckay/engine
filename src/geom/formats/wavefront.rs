@@ -122,7 +122,8 @@ impl<I,V> Format<I,V> for Wavefront
         drop(normals);
         drop(uvs);
 
-        let faces: Vec<Vec<u32>> = face_indices.into_iter().map(|vec| {
+        let faces: Vec<Vec<u32>> = face_indices.into_iter()
+                                                .map(|vec| {
             vec.into_iter().map(|(v,vn,vt)| {
                     vertex_index_map.iter().position(|&((fv,fvn,fvt),_)| {
                         (v == fv) && (vn == fvn) && (vt == fvt)
