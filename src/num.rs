@@ -2,19 +2,24 @@
 use std;
 use std::ops::{Add,Sub,Mul,Div,Neg,Rem};
 
-/// Something that can be casted.
 pub trait Cast<T>
 {
     fn cast(self) -> T;
 }
 
 /// A number which can be casted.
-pub trait NumCast : Cast<i8>  + Cast<u8> +
+pub trait CastNum : Cast<i8>  + Cast<u8> +
                     Cast<i16> + Cast<u16> +
                     Cast<i32> + Cast<u32> +
                     Cast<i64> + Cast<u64> +
                     Cast<isize> + Cast<usize> +
                     Cast<f32> + Cast<f64> {
+}
+
+pub trait NumCast : CastNum
+{
+    fn from<I>(val: I) -> Self
+        where I: CastNum;
 }
 
 /// A number which has an additive identity.
@@ -126,20 +131,27 @@ macro_rules! impl_cast {
 
 macro_rules! impl_numcast {
     ($ty:ident) => {
-        impl NumCast for $ty { }
+        impl NumCast for $ty {
+            fn from<I>(val: I) -> Self
+                where I: CastNum {
+                val.cast()
+            }
+        }
 
-        impl_cast!($ty, i8);
+        impl CastNum for $ty { }
+
         impl_cast!($ty, u8);
-        impl_cast!($ty, i16);
+        impl_cast!($ty, i8);
         impl_cast!($ty, u16);
-        impl_cast!($ty, i32);
+        impl_cast!($ty, i16);
         impl_cast!($ty, u32);
-        impl_cast!($ty, i64);
+        impl_cast!($ty, i32);
         impl_cast!($ty, u64);
-        impl_cast!($ty, usize);
-        impl_cast!($ty, isize);
+        impl_cast!($ty, i64);
         impl_cast!($ty, f32);
         impl_cast!($ty, f64);
+        impl_cast!($ty, usize);
+        impl_cast!($ty, isize);
     }
 }
 
@@ -356,10 +368,9 @@ impl_bounded!(isize, std::isize::MIN, std::isize::MAX);
 impl_bounded!(f32, std::f32::MIN, std::f32::MAX);
 impl_bounded!(f64, std::f64::MIN, std::f64::MAX);
 
-/// Casts a number from one type to another.
-pub fn cast<T, U: Cast<T>>(n: U) -> T
-{
-    n.cast()
+pub fn cast<T,V>(from: T) -> V
+    where T: NumCast, V: NumCast {
+    V::from(from)
 }
 
 pub fn zero<T: Zero>() -> T

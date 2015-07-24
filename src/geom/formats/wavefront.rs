@@ -1,12 +1,12 @@
 
 use math::{Scalar,Vector3};
 use geom::{self,mesh,Format};
-use num;
+use num::{self};
+use geom::utils;
 
 use std::{self,io};
 
 // TODO: parse VertexTextureCoords
-// TODO: handle triangularisation
 
 #[derive(Copy,Clone)]
 pub struct Vertex
@@ -22,6 +22,15 @@ impl geom::Face for Face
 {
     type Vertex = (i32,i32,i32);
     fn vertices<'a>(&'a self) -> std::slice::Iter<'a, (i32,i32,i32)> {
+        self.iter()
+    }
+}
+
+impl geom::Face for Vec<u32>
+{
+    type Vertex = u32;
+
+    fn vertices<'a>(&'a self) -> std::slice::Iter<'a, Self::Vertex> {
         self.iter()
     }
 }
@@ -122,17 +131,18 @@ impl<I,V> Format<I,V> for Wavefront
         drop(normals);
         drop(uvs);
 
-        let faces: Vec<Vec<u32>> = face_indices.into_iter()
+        let faces: Vec<Vec<I>> = face_indices.into_iter()
                                                 .map(|vec| {
             vec.into_iter().map(|(v,vn,vt)| {
-                    vertex_index_map.iter().position(|&((fv,fvn,fvt),_)| {
+                    num::cast(vertex_index_map.iter().position(|&((fv,fvn,fvt),_)| {
                         (v == fv) && (vn == fvn) && (vt == fvt)
-                    }).unwrap() as u32
+                    }).unwrap())
             }).collect()
 
         }).collect();
 
-        let vertices: Vec<V> = vertex_index_map.into_iter().map(|((_,_,_),v)| v.into()).collect();
+        let vertices = vertex_index_map.into_iter().map(|((_,_,_),v)| v.into());
+        builder.feed_vertices(vertices);
 
     }
 }
@@ -204,20 +214,20 @@ pub mod load
     }
 
     pub fn parse_face_indices(s: &str) -> (i32,i32,i32) {
-        let indices: Vec<Option<i32>> = s.split('/')
+        let indices: Vec<i32> = s.split('/')
                                  .map(|s| match s.trim().len() {
                                      // if it doesn't exist, set it to -1
-                                     0 => None,
+                                     0 => -1,
                                      // parse the int
-                                     _ =>  Some(FromStr::from_str(s).unwrap()),
+                                     _ => FromStr::from_str(s).unwrap(),
                                  }).collect();
 
         assert!(indices.len() <= 3);
 
         // get the indices. make sure they are zero based.
-        let vi = indices.get(0).map(|&a|a).unwrap().map(|i| i-1).unwrap();
-        let ni = indices.get(2).map(|&a|a).unwrap().map(|i| i-1).unwrap_or(-1);
-        let ti = indices.get(1).map(|&a|a).unwrap().map(|i| i-1).unwrap_or(-1);
+        let vi = indices.get(0).map(|&a|a-1).unwrap();
+        let ni = indices.get(2).map(|&a|a-1).unwrap_or(-1);
+        let ti = indices.get(1).map(|&a|a-1).unwrap_or(-1);
 
         (vi,ni,ti)
     }

@@ -2,22 +2,26 @@
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
 use geom;
-use libc::types::common::c95::c_void;
-use std::mem;
+use libc::c_void;
+use std::{self, mem};
 
 pub struct Buffer
 {
     index_buffer: GLuint,
+    pub index_count: usize,
     vertex_buffer: GLuint,
+    pub vertex_count: usize,
 }
 
 impl Buffer
 {
-    pub unsafe fn from_raw(index_buffer: GLuint,
-                           vertex_buffer: GLuint) -> Buffer {
+    pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
+                           vertex_buffer: GLuint, vertex_count: usize) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
+            index_count: index_count,
             vertex_buffer: vertex_buffer,
+            vertex_count: vertex_count,
         }
     }
 
@@ -26,10 +30,7 @@ impl Buffer
 
         unsafe {
             gl::GenBuffers(2, buffers.as_mut_ptr());
-        }
-
-        unsafe {
-            Buffer::from_raw(buffers[0], buffers[1])
+            Buffer::from_raw(buffers[0], 0, buffers[1], 0)
         }
     }
 
@@ -53,18 +54,22 @@ impl Buffer
         self
     }
 
-    pub fn load_index_data<T>(self, data: &[T], usage: GLenum) -> Self {
+    pub fn load_index_data<T>(mut self, data: &[T], usage: GLenum) -> Self {
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
+
+        self.index_count = data.len();
 
         unsafe {
             self.load_index_data_raw(ptr, size as GLsizeiptr, usage)
         }
     }
     
-    pub fn load_vertex_data<T>(self, data: &[T], usage: GLenum) -> Self {
+    pub fn load_vertex_data<T>(mut self, data: &[T], usage: GLenum) -> Self {
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
+
+        self.vertex_count = data.len();
 
         unsafe {
             self.load_vertex_data_raw(ptr, size as GLsizeiptr, usage)
@@ -120,6 +125,10 @@ impl Data
         self.buffers.extend(data.buffers()
                                 .map(|b| Buffer::new().load(b, usage)));
         self
+    }
+
+    pub fn buffers<'a>(&'a self) -> std::slice::Iter<'a, Buffer> {
+        self.buffers.iter()
     }
 }
 
