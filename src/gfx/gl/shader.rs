@@ -1,7 +1,7 @@
 
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
-use std::{ptr,mem,ffi};
+use std::{fmt,ptr,mem,ffi};
 
 #[derive(Copy,Clone)]
 pub enum Kind
@@ -17,6 +17,16 @@ impl Kind
             Kind::Vertex => gl::VERTEX_SHADER,
             Kind::Fragment => gl::FRAGMENT_SHADER,
         }
+    }
+}
+
+impl fmt::Display for Kind
+{
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> Result<(),fmt::Error> {
+        match *self {
+            Kind::Vertex => "vertex",
+            Kind::Fragment => "fragment",
+        }.fmt(fmt)
     }
 }
 

@@ -23,3 +23,13 @@ pub trait Face: Clone
         self.vertices().count() == 3
     }
 }
+
+impl<I> Face for Vec<I> where I: Copy+Clone
+{
+    type Vertex = I;
+
+    fn vertices<'a>(&'a self) -> std::slice::Iter<'a, Self::Vertex> {
+        self.iter()
+    }
+}
+

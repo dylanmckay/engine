@@ -1,10 +1,9 @@
 
 use math::{Scalar,Vector3};
 use geom::{self,mesh,Format};
-use num::{self};
-use geom::utils;
+use num;
 
-use std::{self,io};
+use std::io;
 
 // TODO: parse VertexTextureCoords
 
@@ -17,23 +16,6 @@ pub struct Vertex
 }
 
 pub type Face = Vec<(i32,i32,i32)>;
-
-impl geom::Face for Face
-{
-    type Vertex = (i32,i32,i32);
-    fn vertices<'a>(&'a self) -> std::slice::Iter<'a, (i32,i32,i32)> {
-        self.iter()
-    }
-}
-
-impl geom::Face for Vec<u32>
-{
-    type Vertex = u32;
-
-    fn vertices<'a>(&'a self) -> std::slice::Iter<'a, Self::Vertex> {
-        self.iter()
-    }
-}
 
 impl geom::Vertex<Scalar> for Vertex
 {
@@ -143,6 +125,16 @@ impl<I,V> Format<I,V> for Wavefront
 
         let vertices = vertex_index_map.into_iter().map(|((_,_,_),v)| v.into());
         builder.feed_vertices(vertices);
+
+        for face in faces {
+            use geom::Face;
+
+            // TODO: triangulate the face
+            // currently we only accept triangular faces
+            assert!(face.is_triangular());
+
+            builder.feed_indices(face.into_iter());
+        }
 
     }
 }

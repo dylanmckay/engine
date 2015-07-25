@@ -13,6 +13,7 @@ pub mod gfx;
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
 const OBJ_PATH: &'static str = "/home/dylan/Desktop/model.obj";
 const VERTEX_SHADER: &'static str = include_str!("../res/basic_vertex.glsl");
+const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl");
 
 type Vertex = math::Vector3;
 type Index = u16;
@@ -34,14 +35,20 @@ fn main() {
     let backend = gfx::gl::backends::glfw::Backend::new();
     let mut device = gfx::gl::Device::new(backend);
 
-    let shader = match gfx::gl::shader::Shader::compile(gfx::gl::shader::Kind::Vertex,
-                                                        VERTEX_SHADER) {
-        Ok(shader) => shader,
-        Err(msg) => panic!(format!("Failed to compile vertex shader: {}", msg)),
-    };
+    // compile and link the program
+    let program = {
+        let sources = [(gfx::gl::shader::Kind::Vertex, VERTEX_SHADER),
+                       (gfx::gl::shader::Kind::Fragment, FRAGMENT_SHADER)];
 
-    let shaders = std::iter::once(shader);
-    let program = gfx::gl::shader::Program::link(shaders).unwrap();
+        let shaders = sources.iter().map(|&(kind,source)| {
+            match gfx::gl::shader::Shader::compile(kind,source) {
+                Ok(shader) => shader,
+                Err(msg) => { panic!(format!("failed to compile {} shader: {}", kind, msg)); },
+            }
+        });
+
+        gfx::gl::shader::Program::link(shaders).unwrap()
+    };
 
     let mesh = device.load_mesh_data(&mesh_data);
 
