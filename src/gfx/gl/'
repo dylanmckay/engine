@@ -1,8 +1,8 @@
 
 use gfx::gl::gl;
-use gfx::gl::vertex;
 use gfx::gl::gl::types::*;
 use geom;
+use math;
 use libc::c_void;
 use std::{self, mem};
 
@@ -13,14 +13,14 @@ pub struct Buffer
     vertex_buffer: GLuint,
     pub vertex_count: usize,
 
-    pub vertex_format: vertex::Format,
+    pub vertex_format: VertexFormat,
 }
 
 impl Buffer
 {
     pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
                            vertex_buffer: GLuint, vertex_count: usize,
-                           vertex_format: vertex::Format) -> Buffer {
+                           vertex_format: VertexFormat) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
             index_count: index_count,
@@ -35,7 +35,7 @@ impl Buffer
 
         unsafe {
             gl::GenBuffers(2, buffers.as_mut_ptr());
-            Buffer::from_raw(buffers[0], 0, buffers[1], 0, vertex::Format::empty())
+            Buffer::from_raw(buffers[0], 0, buffers[1], 0, VertexFormat::empty())
         }
     }
 
@@ -71,7 +71,7 @@ impl Buffer
     }
     
     pub fn load_vertex_data<T>(mut self, data: &[T], usage: GLenum) -> Self
-        where T: vertex::Vertex {
+        where T: Vertex {
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
 
@@ -84,7 +84,7 @@ impl Buffer
     }
 
     pub fn load<I,V>(self, buffer: &geom::mesh::Buffer<I,V>, usage: GLenum) -> Self
-        where V: vertex::Vertex {
+        where V: Vertex {
         self.load_index_data(&buffer.indices, usage)
             .load_vertex_data(&buffer.vertices, usage)
     }
@@ -130,7 +130,7 @@ impl Data
     }
 
     pub fn load<I,V>(mut self, data: &geom::mesh::Data<I,V>, usage: GLenum) -> Self
-        where V: vertex::Vertex {
+        where V: Vertex {
         self.buffers.extend(data.buffers()
                                 .map(|b| Buffer::new().load(b, usage)));
         self
@@ -141,3 +141,73 @@ impl Data
     }
 }
 
+#[derive(Copy,Clone,Debug)]
+pub struct VertexFormat
+{
+    // the number of bytes in a component
+    pub component_size: u16,
+    pub component_count: u16,
+}
+
+impl VertexFormat {
+    pub fn empty() -> Self {
+        VertexFormat {
+            component_size: 0,
+            component_count: 0,
+        }
+    }
+
+    pub fn total_size(self) -> usize {
+        self.component_size as usize * self.component_count as usize
+    }
+}
+
+pub trait Component
+{
+    fn gl_type(&self) -> types::GLenum;
+}
+
+/// An OpenGL vertex
+pub trait Vertex : Sized
+{
+    type Component;
+
+    fn component_count() -> u16 {
+        let total_size = Self::total_size();
+        let component_size = Self::component_size();
+
+        // check that the size fits a whole number of components.
+        // TODO: alignment could mess this up
+        assert!(total_size % component_size == 0,
+                "the vertex does not contain solely one component type");
+
+        total_size / component_size
+    }
+
+    fn component_size() -> u16 {
+        mem::size_of::<Self::Component>() as u16
+    }
+
+    fn total_size() -> u16 {
+        mem::size_of::<Self>() as u16
+    }
+
+    fn format() -> VertexFormat {
+        VertexFormat {
+            component_size: Self::component_size(),
+            component_count: Self::component_count(),
+        }
+    }
+}
+
+impl<T> Vertex for math::Vector3<T> {
+    type Component = T;
+}
+
+impl Component for f32 {
+    fn gl_type(&self) -> types::GLenum { gl::FLOAT }
+}
+
+impl Component for f64 {
+    fn gl_type(&self) -> types::GLenum { gl::DOUBLE }
+}

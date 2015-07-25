@@ -1,6 +1,6 @@
 
 use gfx;
-use gfx::gl::gl;
+use gfx::gl::gl::{self,types};
 use color::NormalizedRGBA;
 use libc::c_void;
 use std::ptr;
@@ -22,16 +22,26 @@ impl Canvas
     }
 
     pub fn draw_mesh(&self, mesh: &gfx::gl::mesh::Data, program: &gfx::gl::Program) {
+
         program.enable();
 
         for buffer in mesh.buffers() {
             buffer.bind_vertices();
             buffer.bind_indices();
+
+            let vertex_format = buffer.vertex_format;
+
+            // TODO: check this somewhere else, return result
+            assert!(vertex_format.component_count > 0 && vertex_format.component_count <= 4,
+                    "OpenGL only supports vertices with 1..4 components");
+
             unsafe {
                 gl::EnableVertexAttribArray(0);
-                gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, 0 as *const c_void);
+                gl::VertexAttribPointer(0, vertex_format.component_count as types::GLint,
+                                        vertex_format.component_type,
+                                        gl::FALSE, 0, 0 as *const c_void);
 
-                gl::DrawElements(gl::TRIANGLES, buffer.index_count as gl::types::GLsizei,
+                gl::DrawElements(gl::TRIANGLES, buffer.index_count as types::GLint,
                                  gl::UNSIGNED_SHORT, ptr::null());
                 gl::DisableVertexAttribArray(0);
             }
