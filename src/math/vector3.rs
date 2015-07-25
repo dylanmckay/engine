@@ -36,6 +36,10 @@ impl<T: Primitive> Vector3<T>
         val
     }
 
+    pub fn cast<V>(self) -> Vector3<V> where V: Primitive {
+        self.map(|a| num::cast(a))
+    }
+
     /// Calculates the length of the vector.
     pub fn length(self) -> T
         where T: Decimal {

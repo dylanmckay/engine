@@ -37,6 +37,13 @@ impl Vertex
     }
 }
 
+// Gets the position of a vertex
+impl<T: num::Primitive> From<Vertex> for Vector3<T> {
+    fn from(vert: Vertex) -> Vector3<T> {
+        vert.position.cast()
+    }
+}
+
 pub struct Wavefront;
 
 impl<I,V> Format<I,V> for Wavefront

@@ -18,13 +18,6 @@ const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl")
 type Vertex = math::Vector3;
 type Index = u16;
 
-impl From<geom::formats::wavefront::Vertex> for Vertex
-{
-    fn from(vert: geom::formats::wavefront::Vertex) -> Vertex {
-        vert.position
-    }
-}
-
 fn main() {
     use geom::formats::Format;
     use std;
