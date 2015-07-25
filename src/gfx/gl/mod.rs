@@ -4,7 +4,7 @@ extern crate gl;
 pub use self::device::Device;
 pub use self::canvas::Canvas;
 pub use self::shader::{Shader,Program};
-pub use self::vertex::{Component,Vertex};
+pub use self::vertex::{Type,Vertex};
 
 pub use self::backends::Backend;
 

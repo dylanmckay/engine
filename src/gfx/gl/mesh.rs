@@ -13,6 +13,7 @@ pub struct Buffer
     vertex_buffer: GLuint,
     pub vertex_count: usize,
 
+    pub index_type: GLenum,
     pub vertex_format: vertex::Format,
 }
 
@@ -20,12 +21,14 @@ impl Buffer
 {
     pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
                            vertex_buffer: GLuint, vertex_count: usize,
+                           index_type: GLuint,
                            vertex_format: vertex::Format) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
             index_count: index_count,
             vertex_buffer: vertex_buffer,
             vertex_count: vertex_count,
+            index_type: index_type,
             vertex_format: vertex_format,
         }
     }
@@ -35,7 +38,7 @@ impl Buffer
 
         unsafe {
             gl::GenBuffers(2, buffers.as_mut_ptr());
-            Buffer::from_raw(buffers[0], 0, buffers[1], 0, vertex::Format::empty())
+            Buffer::from_raw(buffers[0], 0, buffers[1], 0, 0, vertex::Format::empty())
         }
     }
 
@@ -59,11 +62,14 @@ impl Buffer
         self
     }
 
-    pub fn load_index_data<T>(mut self, data: &[T], usage: GLenum) -> Self {
+    pub fn load_index_data<T>(mut self, data: &[T], usage: GLenum) -> Self
+        where T: vertex::Type {
+
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
 
         self.index_count = data.len();
+        self.index_type = T::gl_type();
 
         unsafe {
             self.load_index_data_raw(ptr, size as GLsizeiptr, usage)
@@ -84,7 +90,7 @@ impl Buffer
     }
 
     pub fn load<I,V>(self, buffer: &geom::mesh::Buffer<I,V>, usage: GLenum) -> Self
-        where V: vertex::Vertex {
+        where I: vertex::Type, V: vertex::Vertex {
         self.load_index_data(&buffer.indices, usage)
             .load_vertex_data(&buffer.vertices, usage)
     }
@@ -130,7 +136,7 @@ impl Data
     }
 
     pub fn load<I,V>(mut self, data: &geom::mesh::Data<I,V>, usage: GLenum) -> Self
-        where V: vertex::Vertex {
+        where I: vertex::Type, V: vertex::Vertex {
         self.buffers.extend(data.buffers()
                                 .map(|b| Buffer::new().load(b, usage)));
         self

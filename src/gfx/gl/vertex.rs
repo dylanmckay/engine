@@ -26,7 +26,7 @@ impl Format {
     }
 }
 
-pub trait Component
+pub trait Type
 {
     fn gl_type() -> GLenum;
 }
@@ -34,7 +34,7 @@ pub trait Component
 /// An OpenGL vertex
 pub trait Vertex : Sized
 {
-    type Component : Component;
+    type Type : Type;
 
     fn component_count() -> u16 {
         let total_size = Self::total_size();
@@ -49,7 +49,7 @@ pub trait Vertex : Sized
     }
 
     fn component_size() -> u16 {
-        mem::size_of::<Self::Component>() as u16
+        mem::size_of::<Self::Type>() as u16
     }
 
     fn total_size() -> u16 {
@@ -60,20 +60,20 @@ pub trait Vertex : Sized
         Format {
             component_size: Self::component_size(),
             component_count: Self::component_count(),
-            component_type: Self::Component::gl_type(),
+            component_type: Self::Type::gl_type(),
         }
     }
 }
 
 impl<T> Vertex for math::Vector3<T>
-    where T: Component {
-    type Component = T;
+    where T: Type {
+    type Type = T;
 }
 //GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, and GL_UNSIGNED_INT 
 
 macro_rules! impl_component {
     ($ty:ident, $val:ident) => {
-        impl Component for $ty {
+        impl Type for $ty {
             fn gl_type() -> GLenum {
                 gl::$val
             }

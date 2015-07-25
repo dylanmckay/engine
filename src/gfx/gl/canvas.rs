@@ -42,7 +42,7 @@ impl Canvas
                                         gl::FALSE, 0, 0 as *const c_void);
 
                 gl::DrawElements(gl::TRIANGLES, buffer.index_count as types::GLint,
-                                 gl::UNSIGNED_SHORT, ptr::null());
+                                 buffer.index_type, ptr::null());
                 gl::DisableVertexAttribArray(0);
             }
 

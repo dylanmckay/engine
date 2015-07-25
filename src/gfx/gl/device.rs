@@ -34,7 +34,7 @@ impl<B: gl::Backend> Device<B>
 
     pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::Data<I,V>)
         -> gl::mesh::Data
-        where V: gl::Vertex {
+        where I: gl::Type, V: gl::Vertex {
         gl::mesh::Data::new().load(data, libgl::STATIC_DRAW)
     }
 }
