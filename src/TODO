@@ -1,5 +1,0 @@
-
-VertexPiece represents a tuple which is a part of a Vertex (i.e. position/normal/texture).
-
-The only real reason for this is to serialize into a `Format` object. `Format` should be
-renamed to `PieceFormat`, and `VertexPiece` should be replaced by `Into<PieceFormat>`.

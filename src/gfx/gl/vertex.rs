@@ -4,8 +4,15 @@ use math;
 use num;
 use std::mem;
 
+/// A vertex format.
+pub trait Format
+{
+    fn info() -> FormatInfo;
+}
+
+/// Information about a vertex format.
 #[derive(Copy,Clone,Debug)]
-pub struct Format
+pub struct FormatInfo
 {
     // the number of bytes in a component
     pub component_size: u16,
@@ -13,9 +20,9 @@ pub struct Format
     pub component_type: GLenum,
 }
 
-impl Format {
+impl FormatInfo {
     pub fn empty() -> Self {
-        Format {
+        FormatInfo {
             component_size: 0,
             component_count: 0,
             component_type: 0,
@@ -27,69 +34,71 @@ impl Format {
     }
 }
 
-pub trait Type
+/// A type which can be used by OpenGL.
+pub trait Type : Sized
 {
     fn gl_type() -> GLenum;
+    fn size() -> usize;
 }
 
 /// An OpenGL vertex.
-/// 
-/// Vertices are made of a number of `VertexPiece`s.
 pub trait Vertex : Sized
 {
-    fn piece_formats() -> Vec<Format>;
+    fn piece_formats() -> Vec<FormatInfo>;
     fn total_size() -> usize {
         Self::piece_formats().iter().fold(0, |a,f| a+f.total_size())
     }
 }
 
-/// A tuple of elements of the same type, all a part of the same value.
-pub trait VertexPiece : Sized
-{
-    type Type : Type;
-
-    /// Gets the number of components in the piece.
-    fn component_count() -> u16 {
-        let total_size = Self::total_size();
-        let component_size = Self::component_size();
-
-        // check that the size fits a whole number of components.
-        // TODO: alignment could mess this up
-        assert!(total_size % component_size == 0,
-                "the vertex does not contain solely one component type");
-
-        total_size / component_size
-    }
-
-    /// Gets the size of each component.
-    fn component_size() -> u16 {
-        mem::size_of::<Self::Type>() as u16
-    }
-
-    fn total_size() -> u16 {
-        mem::size_of::<Self>() as u16
-    }
-
-    fn format() -> Format {
-        Format {
-            component_size: Self::component_size(),
-            component_count: Self::component_count(),
-            component_type: Self::Type::gl_type(),
+macro_rules! impl_format {
+    ($ty:ty) => {
+        impl_format!($ty, 1; $ty);
+        impl_format!($ty, 2; ($ty,$ty));
+        impl_format!($ty, 3; ($ty,$ty,$ty));
+        impl_format!($ty, 4; ($ty,$ty,$ty,$ty));
+    };
+    ($underlying:ty, $count:expr; $ty:ty)  => {
+        impl Format for $ty {
+            fn info() -> FormatInfo {
+                FormatInfo {
+                    component_size: <$underlying as Type>::size() as u16,
+                    component_type: <$underlying as Type>::gl_type(),
+                    component_count: $count,
+                }
+            }
         }
     }
 }
 
-impl<T> VertexPiece for math::Vector3<T>
-    where T: Type + num::Primitive {
-    type Type = T;
+impl_format!(u8);
+impl_format!(i8);
+impl_format!(u16);
+impl_format!(i16);
+impl_format!(u32);
+impl_format!(i32);
+impl_format!(f32);
+impl_format!(f64);
+
+impl<T: Type + num::Primitive> Format for math::Vector3<T>
+{
+    fn info() -> FormatInfo {
+        FormatInfo {
+            component_size: T::size() as u16,
+            component_count: 3,
+            component_type: T::gl_type(),
+        }
+    }
 }
-//GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, and GL_UNSIGNED_INT 
 
 macro_rules! impl_component {
     ($ty:ident, $val:ident) => {
         impl Type for $ty {
             fn gl_type() -> GLenum {
                 gl::$val
+            }
+
+            fn size() -> usize {
+                mem::size_of::<$ty>()
             }
         }
     }

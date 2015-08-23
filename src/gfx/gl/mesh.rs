@@ -14,7 +14,7 @@ pub struct Buffer
     pub vertex_count: usize,
 
     pub index_type: GLenum,
-    pub piece_formats: Vec<vertex::Format>,
+    pub piece_formats: Vec<vertex::FormatInfo>,
 }
 
 impl Buffer
@@ -22,7 +22,7 @@ impl Buffer
     pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
                            vertex_buffer: GLuint, vertex_count: usize,
                            index_type: GLuint,
-                           piece_formats: Vec<vertex::Format>) -> Buffer {
+                           piece_formats: Vec<vertex::FormatInfo>) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
             index_count: index_count,
