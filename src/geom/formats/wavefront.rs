@@ -225,8 +225,8 @@ pub mod load
 
         // get the indices. make sure they are zero based.
         let vi = indices.get(0).map(|&a|a-1).unwrap();
-        let ni = indices.get(2).map(|&a|a-1).unwrap_or(-1);
-        let ti = indices.get(1).map(|&a|a-1).unwrap_or(-1);
+        let ni = indices.get(2).map(|&a| if a >= 0 { a-1 } else { a }).unwrap();
+        let ti = indices.get(1).map(|&a| if a >= 0 { a-1 } else { a }).unwrap();
 
         (vi,ni,ti)
     }
