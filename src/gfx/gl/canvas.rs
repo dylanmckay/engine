@@ -51,7 +51,7 @@ impl Canvas
                                             piece_format.component_type,
                                             gl::FALSE, vertex_size, cur_piece_offset as *const c_void);
 
-                    cur_piece_offset += piece_size - 1; // zero based, not one-based
+                    cur_piece_offset += piece_size;
                 }
 
                 gl::DrawElements(gl::TRIANGLES, buffer.index_count as GLint,

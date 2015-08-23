@@ -16,8 +16,8 @@ const VERTEX_SHADER: &'static str = include_str!("../res/basic_vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl");
 
 pub struct Vertex {
-    pub position: math::Vector3,
     pub normal: math::Vector3,
+    pub position: math::Vector3,
 }
 
 impl From<geom::formats::wavefront::Vertex> for Vertex
@@ -72,7 +72,7 @@ fn main() {
     let mesh = device.load_mesh_data(&mesh_data);
     let mut clock = 0.0f32;
 
-    let light_pos = math::Vector3(-5.0, 2.5, 1.0);
+    let light_pos = math::Vector3(0.886,1.0,0.);
     program.uniform("lightPosition").set(light_pos);
 
     while device.is_open() {
@@ -85,8 +85,8 @@ fn main() {
 
         let y = clock.sin();
         let transform = geom::Transform3::identity()
-                        .scale(math::Vector3(y,y,y))
-                        .translate(math::Vector3(0.0,y,0.0));
+//                        .scale(math::Vector3(y,y,y))
+                      .translate(math::Vector3(0.0,y,0.0));
 
 
 
