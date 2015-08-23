@@ -18,6 +18,7 @@ const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl")
 type Vertex = math::Vector3;
 type Index = u16;
 
+
 fn main() {
     use geom::formats::Format;
     use std;

@@ -151,6 +151,18 @@ impl Program
         }
     }
 
+    pub fn get_uniform(&self, name: &str) -> Uniform {
+        let src_buf = ffi::CString::new(name).unwrap();
+
+        let location = unsafe {
+            gl::GetUniformLocation(self.program, src_buf.as_ptr())
+        };
+
+        unsafe {
+            Uniform::from_location(location)
+        }
+    }
+
     pub fn enable(&self) {
         unsafe {
             gl::UseProgram(self.program);
@@ -160,6 +172,18 @@ impl Program
     pub fn disable(&self) {
         unsafe {
             gl::UseProgram(0);
+        }
+    }
+}
+
+pub struct Uniform {
+    location: GLint,
+}
+
+impl Uniform {
+    pub unsafe fn from_location(location: GLint) -> Self {
+        Uniform {
+            location: location,
         }
     }
 }
