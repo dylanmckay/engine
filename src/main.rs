@@ -16,8 +16,8 @@ const VERTEX_SHADER: &'static str = include_str!("../res/basic_vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl");
 
 pub struct Vertex {
-    position: math::Vector3,
-    normal: math::Vector3,
+    pub position: math::Vector3,
+    pub normal: math::Vector3,
 }
 
 impl From<geom::formats::wavefront::Vertex> for Vertex

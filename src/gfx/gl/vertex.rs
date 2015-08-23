@@ -32,16 +32,23 @@ pub trait Type
     fn gl_type() -> GLenum;
 }
 
+/// An OpenGL vertex.
+/// 
+/// Vertices are made of a number of `VertexPiece`s.
 pub trait Vertex : Sized
 {
     fn piece_formats() -> Vec<Format>;
+    fn total_size() -> usize {
+        Self::piece_formats().iter().fold(0, |a,f| a+f.total_size())
+    }
 }
 
-/// An OpenGL vertex
+/// A tuple of elements of the same type, all a part of the same value.
 pub trait VertexPiece : Sized
 {
     type Type : Type;
 
+    /// Gets the number of components in the piece.
     fn component_count() -> u16 {
         let total_size = Self::total_size();
         let component_size = Self::component_size();
@@ -54,6 +61,7 @@ pub trait VertexPiece : Sized
         total_size / component_size
     }
 
+    /// Gets the size of each component.
     fn component_size() -> u16 {
         mem::size_of::<Self::Type>() as u16
     }
