@@ -11,7 +11,7 @@ pub mod geom;
 pub mod gfx;
 
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
-const OBJ_PATH: &'static str = "/home/dylan/Desktop/model.obj";
+const MODEL_DATA: &'static str = include_str!("../res/model.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/basic_vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl");
 
@@ -23,8 +23,8 @@ fn main() {
     use geom::formats::Format;
     use std;
 
-    let file = std::fs::File::open(OBJ_PATH).unwrap();
-    let mesh_data: geom::mesh::Data<Index,Vertex> = geom::formats::Wavefront::load(file);
+    let mesh_cursor = std::io::Cursor::new(MODEL_DATA.as_bytes());
+    let mesh_data: geom::mesh::Data<Index,Vertex> = geom::formats::Wavefront::load(mesh_cursor);
 
     let backend = gfx::gl::backends::glfw::Backend::new();
     let mut device = gfx::gl::Device::new(backend);
