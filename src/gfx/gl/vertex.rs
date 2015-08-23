@@ -1,6 +1,7 @@
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
 use math;
+use num;
 use std::mem;
 
 #[derive(Copy,Clone,Debug)]
@@ -66,7 +67,7 @@ pub trait Vertex : Sized
 }
 
 impl<T> Vertex for math::Vector3<T>
-    where T: Type {
+    where T: Type + num::Primitive {
     type Type = T;
 }
 //GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, and GL_UNSIGNED_INT 

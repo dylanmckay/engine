@@ -23,14 +23,14 @@ pub trait NumCast : CastNum
 }
 
 /// A number which has an additive identity.
-pub trait Zero : Add<Output=Self>
+pub trait Zero : Add<Output=Self> + Sized
 {
     fn zero() -> Self;
     fn is_zero(self) -> bool;
 }
 
 /// A number which has a multipicative identity.
-pub trait One: Mul<Output=Self>
+pub trait One: Mul<Output=Self> + Sized
 {
     fn one() -> Self;
 }
@@ -89,7 +89,7 @@ pub trait Decimal : Zero + One + Sized + Bounded + Copy + Clone +
 }
 
 /// A number which can be positive or negative.
-pub trait Signed: Neg<Output=Self>
+pub trait Signed: Neg<Output=Self> + Sized
 {
     fn abs(self) -> Self;
 }
@@ -193,7 +193,7 @@ macro_rules! impl_decimal {
             fn powi(self, n: i32) -> $ty { $ty::powi(self, n) }
             fn powf(self, n: Self) -> $ty { $ty::powf(self, n) }
             fn sqrt(self) -> $ty { $ty::sqrt(self) }
-            fn rsqrt(self) -> $ty { $ty::rsqrt(self) }
+            fn rsqrt(self) -> $ty { 1.0/$ty::sqrt(self) }
             fn cbrt(self) -> $ty { $ty::cbrt(self) }
             fn sin(self) -> $ty { $ty::sin(self) }
             fn cos(self) -> $ty { $ty::cos(self) }
