@@ -1,4 +1,5 @@
 
+use num;
 use std::marker::PhantomData;
 use std;
 
@@ -48,3 +49,16 @@ impl<'a, T: Copy> Iterator for Components<'a, T>
     }
 }
 
+/// The Kronecker Delta function.
+///
+/// This function returns `1` if `x` is equal to `y`, and `0`
+/// if they are not equal.
+pub fn kronecker_delta<T,V>(x: T, y: T) -> V
+    where T: Eq, V: num::Zero + num::One {
+
+    if x == y {
+        V::one()
+    } else {
+        V::zero()
+    }
+}
