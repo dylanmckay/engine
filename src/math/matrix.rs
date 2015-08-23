@@ -2,6 +2,8 @@
 use math;
 use num::Primitive;
 
+/// A matrix.
+/// Note that matrices are stored in row-major form.
 pub trait Matrix<T: Primitive> : Sized
 {
     /// Gets the identity matrix.

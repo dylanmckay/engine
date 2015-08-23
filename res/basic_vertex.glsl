@@ -2,10 +2,10 @@
 #version 330
 #
 
-uniform vec4 origin;
+uniform mat4 worldTransform;
 
 layout(location = 0) in vec4 position;
 void main()
 {
-    gl_Position = origin + position;
+    gl_Position = worldTransform * position;
 }

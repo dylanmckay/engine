@@ -21,6 +21,7 @@ type Index = u16;
 
 fn main() {
     use geom::formats::Format;
+    use math::Matrix;
     use std;
 
     let mesh_cursor = std::io::Cursor::new(MODEL_DATA.as_bytes());
@@ -58,7 +59,13 @@ fn main() {
         canvas.clear();
 
         let y = clock.sin();
-        program.uniform("origin").set((0.,y,0.0,0.0));
+        let transform = geom::Transform3::identity()
+                        .scale(math::Vector3(y,y,y))
+                        .translate(math::Vector3(0.0,y,0.0));
+
+
+
+        program.uniform("worldTransform").set(transform);
 
         canvas.draw_mesh(&mesh, &program);
 
