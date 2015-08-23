@@ -44,7 +44,10 @@ fn main() {
         gfx::gl::shader::Program::link(shaders).unwrap()
     };
 
+
+
     let mesh = device.load_mesh_data(&mesh_data);
+    let mut clock = 0.0f32;
 
     while device.is_open() {
         device.run();
@@ -53,9 +56,14 @@ fn main() {
         canvas.set_background(BACKGROUND);
 
         canvas.clear();
+
+        let y = clock.sin();
+        program.uniform("origin").set((0.,y,0.0,0.0));
+
         canvas.draw_mesh(&mesh, &program);
 
         device.end();
 
+        clock += 0.05;
     }
 }

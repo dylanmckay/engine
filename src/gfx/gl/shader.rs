@@ -1,4 +1,6 @@
 
+pub use self::uniform::Uniform;
+
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
 use std::{fmt,ptr,mem,ffi};
@@ -151,7 +153,7 @@ impl Program
         }
     }
 
-    pub fn get_uniform(&self, name: &str) -> Uniform {
+    pub fn uniform<'a>(&'a self, name: &str) -> Uniform<'a> {
         let src_buf = ffi::CString::new(name).unwrap();
 
         let location = unsafe {
@@ -159,7 +161,7 @@ impl Program
         };
 
         unsafe {
-            Uniform::from_location(location)
+            Uniform::from_location(self, location)
         }
     }
 
@@ -176,14 +178,72 @@ impl Program
     }
 }
 
-pub struct Uniform {
-    location: GLint,
-}
+pub mod uniform
+{
+    use math;
+    use gfx::gl::Program;
+    use gfx::gl::gl::types::*;
+    use gfx::gl::gl;
 
-impl Uniform {
-    pub unsafe fn from_location(location: GLint) -> Self {
-        Uniform {
-            location: location,
+    /// An OpenGL shader uniform.
+    pub struct Uniform<'a> {
+        program: &'a Program,
+        location: GLint,
+    }
+
+    impl<'a> Uniform<'a> {
+        /// Creates a uniform from its location number.
+        pub unsafe fn from_location(program: &'a Program,
+                                    location: GLint) -> Self {
+            Uniform {
+                program: program,
+                location: location,
+            }
+        }
+
+        /// Sets the uniform with a value.
+        // TODO: Handle errors
+        pub fn set<T: Type>(&self, val: T) {
+            self.program.enable();
+            T::set(self.location, val);
+            self.program.disable();
+        }
+    }
+
+    /// A type that can be used in a uniform.
+    // TODO: Implement for all values
+    pub trait Type
+    {
+        fn set(loc: GLint, val: Self);
+    }
+
+    impl Type for f32 {
+        fn set(loc: GLint, val: f32) {
+            unsafe { gl::Uniform1f(loc, val) }
+        }
+    }
+
+    impl Type for (f32,f32) {
+        fn set(loc: GLint, (v1,v2): (f32,f32)) {
+            unsafe { gl::Uniform2f(loc, v1, v2) }
+        }
+    }
+
+    impl Type for (f32,f32,f32) {
+        fn set(loc: GLint, (v1,v2,v3): (f32,f32,f32)) {
+            unsafe { gl::Uniform3f(loc, v1, v2, v3) }
+        }
+    }
+
+    impl Type for (f32,f32,f32,f32) {
+        fn set(loc: GLint, (v1,v2,v3,v4): (f32,f32,f32,f32)) {
+            unsafe { gl::Uniform4f(loc, v1, v2, v3, v4) }
+        }
+    }
+
+    impl Type for math::Vector3<f32> {
+        fn set(loc: GLint, math::Vector3(v1,v2,v3): math::Vector3<f32>) {
+            unsafe { gl::Uniform3f(loc, v1,v2,v3) }
         }
     }
 }
