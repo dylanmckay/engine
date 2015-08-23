@@ -15,9 +15,10 @@ const MODEL_DATA: &'static str = include_str!("../res/model.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 
+#[repr(packed)]
 pub struct Vertex {
-    pub normal: math::Vector3,
     pub position: math::Vector3,
+    pub normal: math::Vector3,
 }
 
 impl From<geom::formats::wavefront::Vertex> for Vertex
