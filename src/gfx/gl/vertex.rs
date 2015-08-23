@@ -32,8 +32,13 @@ pub trait Type
     fn gl_type() -> GLenum;
 }
 
-/// An OpenGL vertex
 pub trait Vertex : Sized
+{
+    fn piece_formats() -> Vec<Format>;
+}
+
+/// An OpenGL vertex
+pub trait VertexPiece : Sized
 {
     type Type : Type;
 
@@ -66,7 +71,7 @@ pub trait Vertex : Sized
     }
 }
 
-impl<T> Vertex for math::Vector3<T>
+impl<T> VertexPiece for math::Vector3<T>
     where T: Type + num::Primitive {
     type Type = T;
 }

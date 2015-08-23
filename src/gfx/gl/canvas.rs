@@ -1,6 +1,7 @@
 
 use gfx;
 use gfx::gl::gl::{self,types};
+use gfx::gl::gl::types::*;
 use color::NormalizedRGBA;
 use libc::c_void;
 use std::ptr;
@@ -29,21 +30,33 @@ impl Canvas
             buffer.bind_vertices();
             buffer.bind_indices();
 
-            let vertex_format = buffer.vertex_format;
-
-            // TODO: check this somewhere else, return result
-            assert!(vertex_format.component_count > 0 && vertex_format.component_count <= 4,
-                    "OpenGL only supports vertices with 1..4 components");
+            let piece_formats = buffer.piece_formats;
+            let piece_count = piece_formats.len();
 
             unsafe {
-                gl::EnableVertexAttribArray(0);
-                gl::VertexAttribPointer(0, vertex_format.component_count as types::GLint,
-                                        vertex_format.component_type,
-                                        gl::FALSE, 0, 0 as *const c_void);
+                for (i,piece_format) in piece_formats.iter().enumerate() {
+                    let component_count = piece_format.component_count;
 
-                gl::DrawElements(gl::TRIANGLES, buffer.index_count as types::GLint,
+                    // TODO: check this somewhere else, return result
+                    assert!(component_count > 0 && component_count <= 4,
+                            "OpenGL only supports vertices with 1..4 components");
+
+
+                    gl::EnableVertexAttribArray(i as GLuint);
+                    gl::VertexAttribPointer(i as GLuint, component_count as GLint,
+                                            piece_format.component_type,
+                                            gl::FALSE, 0, 0 as *const c_void);
+
+                }
+
+                gl::DrawElements(gl::TRIANGLES, buffer.index_count as GLint,
                                  buffer.index_type, ptr::null());
-                gl::DisableVertexAttribArray(0);
+
+
+                // disable the arrays
+                for i in 0..piece_count {
+                    gl::DisableVertexAttribArray(i as GLuint);
+                }
             }
 
             buffer.unbind_indices();

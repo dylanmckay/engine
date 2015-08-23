@@ -14,7 +14,7 @@ pub struct Buffer
     pub vertex_count: usize,
 
     pub index_type: GLenum,
-    pub vertex_format: vertex::Format,
+    pub piece_formats: Vec<vertex::Format>,
 }
 
 impl Buffer
@@ -22,14 +22,14 @@ impl Buffer
     pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
                            vertex_buffer: GLuint, vertex_count: usize,
                            index_type: GLuint,
-                           vertex_format: vertex::Format) -> Buffer {
+                           piece_formats: Vec<vertex::Format>) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
             index_count: index_count,
             vertex_buffer: vertex_buffer,
             vertex_count: vertex_count,
             index_type: index_type,
-            vertex_format: vertex_format,
+            piece_formats: piece_formats,
         }
     }
 
@@ -38,7 +38,7 @@ impl Buffer
 
         unsafe {
             gl::GenBuffers(2, buffers.as_mut_ptr());
-            Buffer::from_raw(buffers[0], 0, buffers[1], 0, 0, vertex::Format::empty())
+            Buffer::from_raw(buffers[0], 0, buffers[1], 0, 0, Vec::new())
         }
     }
 
@@ -82,7 +82,7 @@ impl Buffer
         let size = mem::size_of::<T>() * data.len();
 
         self.vertex_count = data.len();
-        self.vertex_format = T::format();
+        self.piece_formats = T::piece_formats();
 
         unsafe {
             self.load_vertex_data_raw(ptr, size as GLsizeiptr, usage)
