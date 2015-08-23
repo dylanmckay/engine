@@ -1,7 +1,9 @@
 
 pub use self::formats::Format;
+pub use self::transform::Transform3;
 
 pub mod mesh;
+pub mod transform;
 
 pub mod formats;
 pub mod utils;
