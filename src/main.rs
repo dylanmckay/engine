@@ -30,6 +30,14 @@ impl From<geom::formats::wavefront::Vertex> for Vertex
     }
 }
 
+impl gfx::gl::Vertex for Vertex {
+    fn piece_formats() -> Vec<gfx::gl::vertex::Format> {
+        use gfx::gl::vertex::VertexPiece;
+        let fmt = <math::Vector3 as VertexPiece>::format();
+        [fmt,fmt].iter().map(|&a|a).collect()
+    }
+}
+
 type Index = u16;
 
 

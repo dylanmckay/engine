@@ -30,7 +30,7 @@ impl Canvas
             buffer.bind_vertices();
             buffer.bind_indices();
 
-            let piece_formats = buffer.piece_formats;
+            let piece_formats = &buffer.piece_formats;
             let piece_count = piece_formats.len();
 
             unsafe {
