@@ -3,18 +3,18 @@ use math::{self,Matrix};
 use num::Primitive;
 use std;
 
-pub struct Matrix4x4<T: Primitive>
+pub struct Matrix4<T: Primitive>
 {
     m: [T; 16],
 }
 
-impl<T: Primitive> Matrix4x4<T>
+impl<T: Primitive> Matrix4<T>
 {
     pub fn new(m11: T, m12: T, m13: T, m14: T,
                m21: T, m22: T, m23: T, m24: T,
                m31: T, m32: T, m33: T, m34: T,
                m41: T, m42: T, m43: T, m44: T) -> Self {
-        Matrix4x4 {
+        Matrix4 {
             m: [
                 m11, m12, m13, m14,
                 m21, m22, m23, m24,
@@ -25,11 +25,11 @@ impl<T: Primitive> Matrix4x4<T>
     }
 }
 
-impl<T: Primitive> Matrix<T> for Matrix4x4<T>
+impl<T: Primitive> Matrix<T> for Matrix4<T>
 {
     fn from_fn<F>(f: F) -> Self
         where F: Fn(usize,usize) -> T {
-        Matrix4x4 {
+        Matrix4 {
             m: [
                 f(0,0), f(0,1), f(0,2), f(0,3),
                 f(1,0), f(1,1), f(1,2), f(1,3),
@@ -61,7 +61,7 @@ impl<T: Primitive> Matrix<T> for Matrix4x4<T>
     fn as_slice_mut<'a>(&'a mut self) -> &'a mut [T] { &mut self.m }
 }
 
-impl<T: Primitive> std::ops::Index<(usize,usize)> for Matrix4x4<T>
+impl<T: Primitive> std::ops::Index<(usize,usize)> for Matrix4<T>
 {
     type Output = T;
 
@@ -70,7 +70,7 @@ impl<T: Primitive> std::ops::Index<(usize,usize)> for Matrix4x4<T>
     }
 }
 
-impl<T: Primitive> std::ops::IndexMut<(usize,usize)> for Matrix4x4<T>
+impl<T: Primitive> std::ops::IndexMut<(usize,usize)> for Matrix4<T>
 {
     fn index_mut<'a>(&'a mut self, (row,col): (usize,usize)) -> &'a mut T {
         &mut self.m[calculate_index(row,col)]

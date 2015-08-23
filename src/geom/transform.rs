@@ -1,8 +1,8 @@
 
-use math::{Scalar,Vector3,Matrix4x4};
+use math::{Scalar,Vector3,Matrix4};
 
 /// A 3D transformation.
-pub type Transform3<T=Scalar> = Matrix4x4<T>;
+pub type Transform3<T=Scalar> = Matrix4<T>;
 
 impl Transform3
 {

@@ -247,8 +247,8 @@ pub mod uniform
         }
     }
 
-    impl Type for math::Matrix4x4<f32> {
-        fn set(loc: GLint, mat: math::Matrix4x4<f32>) {
+    impl Type for math::Matrix4<f32> {
+        fn set(loc: GLint, mat: math::Matrix4<f32>) {
             use math::Matrix;
             let data = mat.as_slice();
             unsafe { gl::UniformMatrix4fv(loc, 1, gl::TRUE, data.as_ptr()) }
