@@ -15,7 +15,21 @@ const MODEL_DATA: &'static str = include_str!("../res/model.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/basic_vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/basic_fragment.glsl");
 
-type Vertex = math::Vector3;
+pub struct Vertex {
+    position: math::Vector3,
+    normal: math::Vector3,
+}
+
+impl From<geom::formats::wavefront::Vertex> for Vertex
+{
+    fn from(val: geom::formats::wavefront::Vertex) -> Vertex {
+        Vertex {
+            position: val.position,
+            normal: val.normal.expect("expected a normal"),
+        }
+    }
+}
+
 type Index = u16;
 
 
@@ -49,6 +63,9 @@ fn main() {
 
     let mesh = device.load_mesh_data(&mesh_data);
     let mut clock = 0.0f32;
+
+    let light_pos = math::Vector3(-5.0, 2.5, 1.0);
+    program.uniform("lightPosition").set(light_pos);
 
     while device.is_open() {
         device.run();
