@@ -1,8 +1,7 @@
-use gfx::gl::gl;
 use gfx::gl::gl::types::*;
+use gfx::gl::Type;
 use math;
 use num;
-use std::mem;
 
 /// A vertex format.
 pub trait Format
@@ -34,20 +33,10 @@ impl FormatInfo {
     }
 }
 
-/// A type which can be used by OpenGL.
-pub trait Type : Sized
-{
-    fn gl_type() -> GLenum;
-    fn size() -> usize;
-}
-
 /// An OpenGL vertex.
 pub trait Vertex : Sized
 {
-    fn piece_formats() -> Vec<FormatInfo>;
-    fn total_size() -> usize {
-        Self::piece_formats().iter().fold(0, |a,f| a+f.total_size())
-    }
+    fn formats() -> Vec<FormatInfo>;
 }
 
 macro_rules! impl_format {
@@ -90,25 +79,3 @@ impl<T: Type + num::Primitive> Format for math::Vector3<T>
     }
 }
 
-macro_rules! impl_component {
-    ($ty:ident, $val:ident) => {
-        impl Type for $ty {
-            fn gl_type() -> GLenum {
-                gl::$val
-            }
-
-            fn size() -> usize {
-                mem::size_of::<$ty>()
-            }
-        }
-    }
-}
-
-impl_component!(u8, UNSIGNED_BYTE);
-impl_component!(i8, BYTE);
-impl_component!(u16, UNSIGNED_SHORT);
-impl_component!(i16, SHORT);
-impl_component!(u32, UNSIGNED_INT);
-impl_component!(i32, INT);
-impl_component!(f32, FLOAT);
-impl_component!(f64, DOUBLE);

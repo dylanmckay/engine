@@ -31,14 +31,14 @@ impl Canvas
             buffer.bind_indices();
 
             // Calculates the total size of the vertex.
-            let vertex_size = buffer.piece_formats.iter().fold(0, |a,f|a+f.total_size()) as GLsizei;
+            let vertex_size = buffer.formats.iter().fold(0, |a,f|a+f.total_size()) as GLsizei;
 
             unsafe {
                 let mut cur_piece_offset = 0;
 
-                for (i,piece_format) in buffer.piece_formats.iter().enumerate() {
-                    let component_count = piece_format.component_count;
-                    let piece_size = piece_format.total_size();
+                for (i,format) in buffer.formats.iter().enumerate() {
+                    let component_count = format.component_count;
+                    let piece_size = format.total_size();
 
                     // TODO: check this somewhere else, return result
                     assert!(component_count > 0 && component_count <= 4,
@@ -48,7 +48,7 @@ impl Canvas
                     // Tell OpenGL about the current piece of the vertex.
                     gl::EnableVertexAttribArray(i as GLuint);
                     gl::VertexAttribPointer(i as GLuint, component_count as GLint,
-                                            piece_format.component_type,
+                                            format.component_type,
                                             gl::FALSE, vertex_size, cur_piece_offset as *const c_void);
 
                     cur_piece_offset += piece_size;
@@ -59,7 +59,7 @@ impl Canvas
 
 
                 // disable the arrays
-                for i in 0..buffer.piece_formats.len() {
+                for i in 0..buffer.formats.len() {
                     gl::DisableVertexAttribArray(i as GLuint);
                 }
             }

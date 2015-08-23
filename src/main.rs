@@ -32,7 +32,7 @@ impl From<geom::formats::wavefront::Vertex> for Vertex
 }
 
 impl gfx::gl::Vertex for Vertex {
-    fn piece_formats() -> Vec<gfx::gl::vertex::FormatInfo> {
+    fn formats() -> Vec<gfx::gl::vertex::FormatInfo> {
         use gfx::gl::vertex::Format;
         let info = <math::Vector3 as Format>::info();
         [info,info].iter().map(|&a|a).collect()

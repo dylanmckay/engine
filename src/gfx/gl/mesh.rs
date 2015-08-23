@@ -2,6 +2,7 @@
 use gfx::gl::gl;
 use gfx::gl::vertex;
 use gfx::gl::gl::types::*;
+use gfx::gl::Type;
 use geom;
 use libc::c_void;
 use std::{self, mem};
@@ -14,7 +15,7 @@ pub struct Buffer
     pub vertex_count: usize,
 
     pub index_type: GLenum,
-    pub piece_formats: Vec<vertex::FormatInfo>,
+    pub formats: Vec<vertex::FormatInfo>,
 }
 
 impl Buffer
@@ -22,14 +23,14 @@ impl Buffer
     pub unsafe fn from_raw(index_buffer: GLuint, index_count: usize,
                            vertex_buffer: GLuint, vertex_count: usize,
                            index_type: GLuint,
-                           piece_formats: Vec<vertex::FormatInfo>) -> Buffer {
+                           formats: Vec<vertex::FormatInfo>) -> Buffer {
         Buffer {
             index_buffer: index_buffer,
             index_count: index_count,
             vertex_buffer: vertex_buffer,
             vertex_count: vertex_count,
             index_type: index_type,
-            piece_formats: piece_formats,
+            formats: formats,
         }
     }
 
@@ -63,7 +64,7 @@ impl Buffer
     }
 
     pub fn load_index_data<T>(mut self, data: &[T], usage: GLenum) -> Self
-        where T: vertex::Type {
+        where T: Type {
 
         let ptr = data.as_ptr() as *const c_void;
         let size = mem::size_of::<T>() * data.len();
@@ -82,7 +83,7 @@ impl Buffer
         let size = mem::size_of::<T>() * data.len();
 
         self.vertex_count = data.len();
-        self.piece_formats = T::piece_formats();
+        self.formats = T::formats();
 
         unsafe {
             self.load_vertex_data_raw(ptr, size as GLsizeiptr, usage)
@@ -90,7 +91,7 @@ impl Buffer
     }
 
     pub fn load<I,V>(self, buffer: &geom::mesh::Buffer<I,V>, usage: GLenum) -> Self
-        where I: vertex::Type, V: vertex::Vertex {
+        where I: Type, V: vertex::Vertex {
         self.load_index_data(&buffer.indices, usage)
             .load_vertex_data(&buffer.vertices, usage)
     }
@@ -136,7 +137,7 @@ impl Data
     }
 
     pub fn load<I,V>(mut self, data: &geom::mesh::Data<I,V>, usage: GLenum) -> Self
-        where I: vertex::Type, V: vertex::Vertex {
+        where I: Type, V: vertex::Vertex {
         self.buffers.extend(data.buffers()
                                 .map(|b| Buffer::new().load(b, usage)));
         self
