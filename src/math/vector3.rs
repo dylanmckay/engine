@@ -125,6 +125,16 @@ impl<T: Primitive> ops::Mul for Vector3<T>
     }
 }
 
+impl<T: Primitive> ops::Mul<T> for Vector3<T>
+{
+    type Output = Vector3<T>;
+
+    fn mul(self, rhs: T) -> Vector3<T> {
+        let Vector3(x,y,z) = self;
+        Vector3(x*rhs, y*rhs, z*rhs)
+    }
+}
+
 impl<T: Primitive> From<(T,T,T)> for Vector3<T> {
     fn from((x,y,z): (T,T,T)) -> Self {
         Vector3(x,y,z)
