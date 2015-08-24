@@ -68,7 +68,7 @@ impl_format!(i32);
 impl_format!(f32);
 impl_format!(f64);
 
-impl<T: Type + num::Primitive> Format for math::Vector3<T>
+impl<T: Type + num::Num> Format for math::Vector3<T>
 {
     fn info() -> FormatInfo {
         FormatInfo {

@@ -1,17 +1,17 @@
 use std;
 use std::ops;
-use num::{self,Primitive,Decimal};
+use num::{self,Num,Decimal};
 use math::{util,Scalar};
 
 #[repr(C)]
 #[derive(Copy,Clone)]
-pub struct Vector3<T: Primitive = Scalar>(pub T,pub T,pub T);
+pub struct Vector3<T: Num = Scalar>(pub T,pub T,pub T);
 
-impl<T: Primitive> Vector3<T>
+impl<T: Num> Vector3<T>
 {
     /// Maps from one vector to another.
     pub fn map<U, F>(self, f: F) -> Vector3<U>
-        where U: Primitive, F: Fn(T) -> U {
+        where U: Num, F: Fn(T) -> U {
         
         let Vector3(old_x,old_y,old_z) = self;
 
@@ -36,7 +36,7 @@ impl<T: Primitive> Vector3<T>
         val
     }
 
-    pub fn cast<V>(self) -> Vector3<V> where V: Primitive {
+    pub fn cast<V>(self) -> Vector3<V> where V: Num {
         self.map(|a| num::cast(a))
     }
 
@@ -59,7 +59,7 @@ impl<T: Primitive> Vector3<T>
     }
 }
 
-impl<T: Primitive> std::iter::FromIterator<T> for Vector3<T>
+impl<T: Num> std::iter::FromIterator<T> for Vector3<T>
 {
     fn from_iter<I>(i: I) -> Self
         where I: IntoIterator<Item=T> {
@@ -72,7 +72,7 @@ impl<T: Primitive> std::iter::FromIterator<T> for Vector3<T>
     }
 }
 
-impl<T: Primitive> Into<(T,T,T)> for Vector3<T>
+impl<T: Num> Into<(T,T,T)> for Vector3<T>
 {
     fn into(self) -> (T,T,T) {
         let Vector3(x,y,z) = self;
@@ -81,7 +81,7 @@ impl<T: Primitive> Into<(T,T,T)> for Vector3<T>
     }
 }
 
-impl<T: Primitive> ops::Add for Vector3<T>
+impl<T: Num> ops::Add for Vector3<T>
 {
     type Output = Self;
 
@@ -91,7 +91,7 @@ impl<T: Primitive> ops::Add for Vector3<T>
     }
 }
 
-impl<T: Primitive> ops::Sub for Vector3<T>
+impl<T: Num> ops::Sub for Vector3<T>
 {
     type Output = Self;
 
@@ -101,7 +101,7 @@ impl<T: Primitive> ops::Sub for Vector3<T>
     }
 }
 
-impl<T: Primitive> ops::Neg for Vector3<T>
+impl<T: Num> ops::Neg for Vector3<T>
     where T: num::Signed
 {
     type Output = Self;
@@ -111,7 +111,7 @@ impl<T: Primitive> ops::Neg for Vector3<T>
     }
 }
 
-impl<T: Primitive> ops::Mul for Vector3<T>
+impl<T: Num> ops::Mul for Vector3<T>
 {
     type Output = Vector3<T>;
 
@@ -125,7 +125,7 @@ impl<T: Primitive> ops::Mul for Vector3<T>
     }
 }
 
-impl<T: Primitive> ops::Mul<T> for Vector3<T>
+impl<T: Num> ops::Mul<T> for Vector3<T>
 {
     type Output = Vector3<T>;
 
@@ -135,7 +135,7 @@ impl<T: Primitive> ops::Mul<T> for Vector3<T>
     }
 }
 
-impl<T: Primitive> From<(T,T,T)> for Vector3<T> {
+impl<T: Num> From<(T,T,T)> for Vector3<T> {
     fn from((x,y,z): (T,T,T)) -> Self {
         Vector3(x,y,z)
     }

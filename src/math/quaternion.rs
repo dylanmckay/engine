@@ -1,6 +1,6 @@
 
 use math;
-use num::{self,Decimal};
+use num::Decimal;
 use std;
 
 /// A quaternion.
@@ -10,8 +10,7 @@ pub struct Quaternion<T: Decimal>(pub T, pub T, pub T, pub T);
 
 impl<T: Decimal> Quaternion<T>
 {
-    pub fn from_euler_radians(euler: math::Vector3<T>) -> Self
-        where T: num::Primitive {
+    pub fn from_euler_radians(euler: math::Vector3<T>) -> Self {
         let half_euler = euler * (T::one()/(T::one()+T::one()));
         let (ex,ey,ez) = half_euler.into();
 

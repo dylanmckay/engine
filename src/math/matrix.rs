@@ -1,10 +1,10 @@
 
 use math;
-use num::Primitive;
+use num::Num;
 
 /// A matrix.
 /// Note that matrices are stored in row-major form.
-pub trait Matrix<T: Primitive> : Sized
+pub trait Matrix<T: Num> : Sized
 {
     /// Gets the identity matrix.
     // TODO: Make this an associated constant.

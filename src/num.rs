@@ -36,16 +36,10 @@ pub trait One: Mul<Output=Self> + Sized
 }
 
 /// A number which is an integer.
-pub trait Integer : Zero + One + Bounded + Copy + Clone +
-                    Add<Output=Self> + Sub<Output=Self> +
-                    Mul<Output=Self> + Div<Output=Self> +
-                    Rem<Output=Self> + PartialEq + NumCast {}
+pub trait Integer : Num { }
 
 /// A decimal number.
-pub trait Decimal : Zero + One + Sized + Bounded + Copy + Clone +
-                    Add<Output=Self> + Sub<Output=Self> +
-                    Mul<Output=Self> + Div<Output=Self> +
-                    Rem<Output=Self> + PartialEq + NumCast
+pub trait Decimal : Num
 {
     // constants
     fn pi() -> Self;
@@ -95,19 +89,14 @@ pub trait Signed: Neg<Output=Self> + Sized
 }
 
 /// A number which does not have a sign.
-pub trait Unsigned { }
+pub trait Unsigned : Num { }
 
 /// A generalised number.
-pub trait Num : Zero + One + Bounded +
+pub trait Num : Copy + Clone + Zero + One + Bounded +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
-                Rem<Output=Self> + PartialEq + NumCast
-{
-
-}
-
-/// A primitive number.
-pub trait Primitive: Copy + Clone + Num + NumCast + PartialOrd
+                Rem<Output=Self> + PartialEq + NumCast +
+                PartialOrd
 {
 
 }
@@ -243,12 +232,11 @@ macro_rules! impl_unsigned {
     }
 }
 
-/// Implements the `Num` and `Primitive` traits on a type.
-macro_rules! impl_num_primitive {
+/// Implements the `Num` trait on a type.
+macro_rules! impl_num {
     ($ty:ident) => {
     
         impl Num       for $ty { }
-        impl Primitive for $ty { }
     }
 }
 
@@ -332,23 +320,23 @@ impl_unsigned!(u32);
 impl_unsigned!(u64);
 impl_unsigned!(usize);
 
-// implement Num + Primitive for unsigned integral types
-impl_num_primitive!(u8);
-impl_num_primitive!(u16);
-impl_num_primitive!(u32);
-impl_num_primitive!(u64);
-impl_num_primitive!(usize);
+// implement Num for unsigned integral types
+impl_num!(u8);
+impl_num!(u16);
+impl_num!(u32);
+impl_num!(u64);
+impl_num!(usize);
 
-// implement Num + Primitive for signed integral types
-impl_num_primitive!(i8);
-impl_num_primitive!(i16);
-impl_num_primitive!(i32);
-impl_num_primitive!(i64);
-impl_num_primitive!(isize);
+// implement Num for signed integral types
+impl_num!(i8);
+impl_num!(i16);
+impl_num!(i32);
+impl_num!(i64);
+impl_num!(isize);
 
-// implement Num + Primitive for floating point types
-impl_num_primitive!(f32);
-impl_num_primitive!(f64);
+// implement Num for floating point types
+impl_num!(f32);
+impl_num!(f64);
 
 // implement Bounded for unsigned integral types
 impl_bounded!(u8,    std::u8::MIN,    std::u8::MAX);
@@ -368,26 +356,31 @@ impl_bounded!(isize, std::isize::MIN, std::isize::MAX);
 impl_bounded!(f32, std::f32::MIN, std::f32::MAX);
 impl_bounded!(f64, std::f64::MIN, std::f64::MAX);
 
+/// Casts a number to another type.
 pub fn cast<T,V>(from: T) -> V
     where T: NumCast, V: NumCast {
     V::from(from)
 }
 
+/// Gets the zero value for a type.
 pub fn zero<T: Zero>() -> T
 {
     Zero::zero()
 }
 
+/// Gets the one value for a type.
 pub fn one<T: One>() -> T
 {
     One::one()
 }
 
+/// Gets the maximum value of a type.
 pub fn max<T: Bounded>() -> T
 {
     Bounded::max()
 }
 
+/// Gets the minimum value of a type.
 pub fn min<T: Bounded>() -> T
 {
     Bounded::min()
