@@ -1,6 +1,6 @@
 use std;
 use std::ops;
-use num::{self,Num,Decimal};
+use num::{self,Num};
 use math::{util,Scalar};
 
 #[repr(C)]
@@ -36,14 +36,16 @@ impl<T: Num> Vector3<T>
         val
     }
 
+    /// Casts the components to a different type.
+    // TODO: Use higher-kinded types to move this into
+    //       the Vector trait when possible.
     pub fn cast<V>(self) -> Vector3<V> where V: Num {
         self.map(|a| num::cast(a))
     }
 
-    /// Calculates the length of the vector.
-    pub fn length(self) -> T
-        where T: Decimal {
-        self.fold(T::zero(), |acc, comp| acc + comp*comp).sqrt()
+    /// Calculates the squared length of the vector.
+    pub fn length_squared(self) -> T {
+        self.fold(T::zero(), |acc, comp| acc + comp*comp)
     }
 
     /// Takes the absolute value of all of the components.
@@ -76,7 +78,6 @@ impl<T: Num> Into<(T,T,T)> for Vector3<T>
 {
     fn into(self) -> (T,T,T) {
         let Vector3(x,y,z) = self;
-
         (x,y,z)
     }
 }
