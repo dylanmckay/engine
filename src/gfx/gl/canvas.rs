@@ -54,8 +54,8 @@ impl Canvas
                     cur_piece_offset += piece_size;
                 }
 
-                gl::DrawElements(gl::TRIANGLES, buffer.index_count as GLint,
-                                 buffer.index_type, ptr::null());
+                gl::DrawElements(gl::TRIANGLES, buffer.index_count() as GLint,
+                                 buffer.index_type(), ptr::null());
 
 
                 // disable the arrays

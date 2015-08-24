@@ -11,6 +11,16 @@ pub trait Type : Sized
     fn size() -> usize;
 }
 
+/// Gets the size of a type specified
+/// by a `GLenum` value.
+pub fn size_of_type(ty: GLenum) -> usize {
+    match ty {
+        gl::FLOAT => 4,
+        gl::UNSIGNED_SHORT => 2,
+        _ => unimplemented!(),
+    }
+}
+
 macro_rules! impl_component {
     ($ty:ident, $val:ident) => {
         impl Type for $ty {
@@ -22,7 +32,7 @@ macro_rules! impl_component {
                 mem::size_of::<$ty>()
             }
         }
-    }
+    };
 }
 
 impl_component!(u8, UNSIGNED_BYTE);
