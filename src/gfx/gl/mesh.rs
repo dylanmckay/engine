@@ -134,7 +134,7 @@ impl Buffer
         let size = (data.len() * mem::size_of::<T>()) as GLsizeiptr;
 
         unsafe {
-            self.load_index_data_raw(ptr, size, usage, T::gl_type())
+            self.load_index_data_raw(ptr, size, usage, T::specifier())
         }
     }
     

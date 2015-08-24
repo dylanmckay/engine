@@ -51,7 +51,7 @@ macro_rules! impl_format {
             fn info() -> FormatInfo {
                 FormatInfo {
                     component_size: <$underlying as Type>::size() as u16,
-                    component_type: <$underlying as Type>::gl_type(),
+                    component_type: <$underlying as Type>::specifier(),
                     component_count: $count,
                 }
             }
@@ -74,7 +74,7 @@ impl<T: Type + num::Primitive> Format for math::Vector3<T>
         FormatInfo {
             component_size: T::size() as u16,
             component_count: 3,
-            component_type: T::gl_type(),
+            component_type: T::specifier(),
         }
     }
 }

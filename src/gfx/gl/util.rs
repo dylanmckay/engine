@@ -7,39 +7,46 @@ use std::mem;
 /// A type which can be used by OpenGL.
 pub trait Type : Sized
 {
-    fn gl_type() -> GLenum;
+    fn specifier() -> GLenum;
     fn size() -> usize;
 }
 
-/// Gets the size of a type specified
-/// by a `GLenum` value.
-pub fn size_of_type(ty: GLenum) -> usize {
-    match ty {
-        gl::FLOAT => 4,
-        gl::UNSIGNED_SHORT => 2,
-        _ => unimplemented!(),
-    }
-}
+/// Implements the `Type` trait for a GL-supported type.
+macro_rules! impl_types {
+    { $($ty:ident: $val:ident),* } => {
 
-macro_rules! impl_component {
-    ($ty:ident, $val:ident) => {
-        impl Type for $ty {
-            fn gl_type() -> GLenum {
-                gl::$val
+        $(
+            impl Type for $ty {
+                fn specifier() -> GLenum {
+                    gl::$val
+                }
+
+                fn size() -> usize {
+                    mem::size_of::<$ty>()
+                }
             }
+        )*
 
-            fn size() -> usize {
-                mem::size_of::<$ty>()
+        /// Gets the size of a type specified
+        /// by a `GLenum` value.
+        pub fn size_of_type(ty: GLenum) -> usize {
+            match ty {
+                $(
+                gl::$val => mem::size_of::<$ty>(),
+                )*
+                _ => unreachable!(),
             }
         }
     };
 }
 
-impl_component!(u8, UNSIGNED_BYTE);
-impl_component!(i8, BYTE);
-impl_component!(u16, UNSIGNED_SHORT);
-impl_component!(i16, SHORT);
-impl_component!(u32, UNSIGNED_INT);
-impl_component!(i32, INT);
-impl_component!(f32, FLOAT);
-impl_component!(f64, DOUBLE);
+impl_types! {
+    u8:  UNSIGNED_BYTE,
+    i8:  BYTE,
+    u16: UNSIGNED_SHORT,
+    i16: SHORT,
+    u32: UNSIGNED_INT,
+    i32: INT,
+    f32: FLOAT,
+    f64: DOUBLE
+}
