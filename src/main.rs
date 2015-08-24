@@ -11,7 +11,7 @@ pub mod geom;
 pub mod gfx;
 
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
-const MODEL_DATA: &'static str = include_str!("../res/model.obj");
+const MODEL_DATA: &'static str = include_str!("../res/model2.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 

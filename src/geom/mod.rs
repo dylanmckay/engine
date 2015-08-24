@@ -6,7 +6,7 @@ pub mod mesh;
 pub mod transform;
 
 pub mod formats;
-pub mod utils;
+pub mod util;
 
 use std;
 
@@ -22,7 +22,10 @@ pub trait Face: Clone
     fn vertices<'a>(&'a self) -> std::slice::Iter<'a, Self::Vertex>;
 
     fn is_triangular(&self) -> bool {
-        self.vertices().count() == 3
+        // Note that we must take into account that the iterator
+        // has already processed one vertex.
+        let c = self.vertices().count();
+        c == 3
     }
 }
 

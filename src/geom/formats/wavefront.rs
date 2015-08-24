@@ -1,6 +1,6 @@
 
 use math::{Scalar,Vector3};
-use geom::{self,mesh,Format};
+use geom::{self,mesh,util,Format};
 use num;
 
 use std::io;
@@ -134,13 +134,16 @@ impl<I,V> Format<I,V> for Wavefront
         builder.feed_vertices(vertices);
 
         for face in faces {
-            use geom::Face;
+            for triangulated_face in util::triangulate(face) {
+                use geom::Face;
 
-            // TODO: triangulate the face
-            // currently we only accept triangular faces
-            assert!(face.is_triangular());
+                // TODO: triangulate the face
+                // currently we only accept triangular faces
+                assert!(triangulated_face.is_triangular());
 
-            builder.feed_indices(face.into_iter());
+                builder.feed_indices(triangulated_face.into_iter());
+
+            }
         }
 
     }
