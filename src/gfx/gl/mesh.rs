@@ -38,16 +38,14 @@ impl RawBuffer
         RawBuffer::new(buffer, 0)
     }
 
-    pub unsafe fn load_raw(mut self, target: GLenum, ptr: *const c_void,
-                           size: GLsizeiptr, usage: GLenum) -> Self {
+    pub unsafe fn load_raw(&mut self, target: GLenum, ptr: *const c_void,
+                           size: GLsizeiptr, usage: GLenum) {
 
         self.bind(target);
         gl::BufferData(target, size, ptr, usage);
         self.unbind(target);
 
         self.size = size;
-
-        self
     }
 
     /// Binds the buffer to the specified target.
