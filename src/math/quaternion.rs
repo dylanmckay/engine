@@ -74,6 +74,31 @@ impl<T: Decimal> Quaternion<T>
         let inverse_len = self.length_inverse();
         self.map(|a| a*inverse_len)
     }
+
+    pub fn as_rotation_matrix(self) -> math::Matrix3<T> {
+        let Quaternion(x,y,z,w) = self;
+        let Quaternion(x2,y2,z2,_) = self.map(|a|a*a);
+
+        let one = T::one();
+        let two = one+one;
+
+        let m11 = one - two*y2 - two*z2;
+        let m12 = two*x*y - two*z*w;
+        let m13 = two*x*z + two*y*w;
+
+        let m21 = two*x*y + two*z*w;
+        let m22 = one - two*x2 - two*z2;
+        let m23 = two*y*z - two*x*w;
+
+        let m31 = two*x*z - two*y*w;
+        let m32 = two*y*z + two*x*w;
+        let m33 = one - two*x2 - two*y2;
+
+        math::Matrix3::new(m11, m12, m13,
+                           m21, m22, m23,
+                           m31, m32, m33)
+
+    }
 }
 
 impl<T: Decimal> std::ops::Mul for Quaternion<T>
