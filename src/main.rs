@@ -101,11 +101,14 @@ impl Context
         self.device.run();
 
         let (v1,v2) = self.device.area().split_half(math::Axis2::Vertical);
+        let (v3,v4) = v2.split_half(math::Axis2::Horizontal);
         let mut canvas1 = v1.begin();
-        let mut canvas2 = v2.begin();
+        let mut canvas2 = v3.begin();
+        let mut canvas3 = v4.begin();
 
         self.render(&mut canvas1);
         self.render(&mut canvas2);
+        self.render(&mut canvas3);
 
         self.device.end();
 

@@ -91,6 +91,12 @@ impl Canvas
         unsafe {
             gl::Viewport(x as i32, y as i32,
                          width as i32, height as i32);
+
+            // TODO: Move this call somewhere more suitable
+            gl::Enable(gl::SCISSOR_TEST);
+
+            gl::Scissor(x as i32, y as i32,
+                        width as i32, height as i32);
         }
     }
 }

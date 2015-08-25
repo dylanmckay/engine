@@ -43,6 +43,7 @@ pub trait Viewport<T: Num> : Sized + Clone
 
     fn split_half(&self, axis: math::Axis2) -> (Self,Self) {
         let (cx,cy) = self.center();
+        let (hx,hy) = self.half_extents();
         let (qx,qy) = self.quarter_extents();
 
         match axis {
@@ -50,11 +51,17 @@ pub trait Viewport<T: Num> : Sized + Clone
                 let c1x = cx - qx;
                 let c2x = cx + qx;
 
-                (Self::new( (c1x,cy), (qx,qy) ),
-                 Self::new( (c2x,cy), (qx,qy) ))
+                (Self::new( (c1x,cy), (qx,hy) ),
+                 Self::new( (c2x,cy), (qx,hy) ))
 
             },
-            _ => unimplemented!(),
+            math::Axis2::Horizontal => {
+                let c1y = cy - qy;
+                let c2y = cy + qy;
+
+                (Self::new( (cx,c1y), (hx,qy) ),
+                 Self::new( (cx,c2y), (hx,qy) ))
+            },
         }
     }
 }
