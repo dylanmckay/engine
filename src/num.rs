@@ -36,11 +36,17 @@ pub trait One: Mul<Output=Self> + Sized
 }
 
 /// A number which is an integer.
-pub trait Integer : Num { }
+pub trait Integer : Num
+{
+    fn constant(val: i64) -> Self;
+}
 
 /// A decimal number.
 pub trait Decimal : Num
 {
+    /// Gets the constant.
+    fn constant(val: f64) -> Self;
+
     // constants
     fn pi() -> Self;
     fn tau() -> Self;
@@ -60,6 +66,7 @@ pub trait Decimal : Num
     fn cbrt(self) -> Self;
     fn sin(self) -> Self;
     fn cos(self) -> Self;
+    fn sincos(self) -> (Self,Self) { (self.sin(),self.cos()) }
     fn tan(self) -> Self;
     fn asin(self) -> Self;
     fn acos(self) -> Self;
@@ -162,7 +169,10 @@ macro_rules! impl_zero_one {
 
 macro_rules! impl_integer {
     ($ty:ident) => {
-        impl Integer for $ty { }
+        impl Integer for $ty
+        {
+            fn constant(val: i64) -> $ty { val as $ty }
+        }
     }
 }
 
@@ -170,6 +180,8 @@ macro_rules! impl_decimal {
     ($ty:ident) => {
         impl Decimal for $ty
         {
+            fn constant(val: f64) -> $ty { val as $ty }
+
             fn pi() -> $ty { ::std::$ty::consts::PI }
             fn tau() -> $ty { ::std::$ty::consts::PI * 2.0}
             fn e() -> $ty { ::std::$ty::consts::E }

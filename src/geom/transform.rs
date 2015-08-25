@@ -1,9 +1,12 @@
 
-use math::{Vector3,Matrix,Matrix3,Matrix4};
-use num::Num;
+use math::{self,Vector3,Matrix,Matrix3,Matrix4};
+use num::{self,Num,Decimal};
 
 /// A 3D transformation.
 pub type Transform3<T> = Matrix4<T>;
+
+/// A 3D rotation matrix.
+pub type Rotation3<T> = Matrix3<T>;
 
 impl<T: Num> Transform3<T>
 {
@@ -49,12 +52,17 @@ impl<T: Num> Transform3<T>
         self
     }
 
-    pub fn rotate(self, mat: Matrix3<T>) -> Self {
-        let rot_mat = self.get_rotation() * mat;
+    pub fn rotate<R>(self, rot: R) -> Self
+        where R: Into<Rotation3<T>> {
+
+        let rot_mat = self.get_rotation() * rot.into();
         self.set_rotation(rot_mat)
     }
 
-    pub fn set_rotation(mut self, mat: Matrix3<T>) -> Self {
+    pub fn set_rotation<R>(mut self, rot: R) -> Self
+        where R: Into<Rotation3<T>> {
+
+        let mat: Matrix3<T> = rot.into();
         for row in 0..3 {
             for col in 0..3 {
                 self[(row,col)] = mat[(row,col)];
@@ -63,8 +71,43 @@ impl<T: Num> Transform3<T>
         self
     }
 
-    pub fn get_rotation(&self) -> Matrix3<T> {
+    pub fn get_rotation(&self) -> Rotation3<T> {
         // Get the rotation submatrix
         Matrix3::from_fn(|i,j| self[(i,j)])
+    }
+}
+
+impl<T: Decimal> Into<Rotation3<T>> for math::Quaternion<T>
+{
+    fn into(self) -> Rotation3<T> {
+        self.as_rotation_matrix()
+    }
+}
+
+impl<T: Decimal+num::Signed> Into<Rotation3<T>> for math::Vector3<T>
+{
+    fn into(self) -> Rotation3<T> {
+        let (x,y,z) = self.into();
+        // yezdiny => y
+        // zttitude => z
+        // xznk => x
+        let (sx,cx) = x.sincos();
+        let (sy,cy) = y.sincos();
+        let (sz,cz) = z.sincos();
+
+        let m11 = cy*cz;
+        let m12 = -cy*sz*cx + sy*sx;
+        let m13 = cy*sz*sx + sy*cx;
+        let m21 = sz;
+        let m22 = cz*cx;
+        let m23 = -cz*sx;
+        let m31 = -sy*cz;
+        let m32 = sy*sz*cx + cy*sx;
+        let m33 = -sy*sz*sx + cy*cx;
+
+        Rotation3::new(m11, m12, m13,
+                       m21, m22, m23,
+                       m31, m32, m33)
+
     }
 }

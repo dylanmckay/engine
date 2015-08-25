@@ -87,7 +87,8 @@ fn main() {
         let y = clock.sin();
         let transform = geom::Transform3::identity()
 //                        .scale(math::Vector3(y,y,y))
-                      .translate(math::Vector3(0.0,y,0.0));
+//                      .translate(math::Vector3(0.0,y,0.0));
+                        .rotate(math::Vector3(y*0.2,y,0.0));
 
 
 
