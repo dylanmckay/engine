@@ -25,11 +25,19 @@ impl<B: gl::Backend> Device<B>
     }
 
     pub fn begin(&self) -> gl::Canvas {
-        gl::Canvas
+        let orig_viewport = self.area();
+        let viewport = self.map_viewport_to_pixel(orig_viewport);
+
+        gl::Canvas::new(viewport)
     }
 
     pub fn end(&mut self) {
         self.backend.end()
+    }
+
+    /// Gets the viewport containing the entire area.
+    pub fn area(&self) -> gl::Viewport<f32> {
+        gl::Viewport::entire_area()
     }
 
     /// Gets the dimensions in pixels.
@@ -76,6 +84,36 @@ impl<B: gl::Backend> Device<B>
     /// function does nothing.
     pub fn set_title(&mut self, title: &str) {
         self.backend.set_title(title);
+    }
+
+    /// Maps from window coordinates to pixel coordinates.
+    pub fn map_point_to_pixel(&self, point: (f32,f32)) -> (u32,u32) {
+        let (half_width,half_height) = match self.dimensions() {
+            (w,h) => (w as f32 / 2.0, h as f32 / 2.0),
+        };
+
+        let (x,y) = point;
+        let pixel_x = half_width * (x+1.);
+        let pixel_y = half_height * (y+1.);
+
+        (pixel_x as u32, pixel_y as u32)
+    }
+
+    /// Maps a viewport into pixel space.
+    // TODO: If the viewport is out of bounds, truncate it.
+    pub fn map_viewport_to_pixel(&self, port: gl::Viewport<f32>) -> gl::Viewport<u32> {
+        use gfx::Viewport;
+
+        let center = self.map_point_to_pixel(port.center());
+
+        let (orig_width,orig_height) = port.half_extents();
+        let (device_width,device_height) = self.dimensions();
+        let (dw,dh) = (device_width/2,device_height/2);
+
+        let half_extents = (orig_width as u32 * dw,
+                            orig_height as u32 * dh);
+
+        gl::Viewport::new(center, half_extents)
     }
 }
 

@@ -1,15 +1,25 @@
 
 use gfx;
+use gfx::gl::Viewport;
 use gfx::gl::gl;
 use gfx::gl::gl::types::*;
 use color::NormalizedRGBA;
 use libc::c_void;
 use std::ptr;
 
-pub struct Canvas;
+pub struct Canvas
+{
+    viewport: Viewport<u32>,
+}
 
 impl Canvas
 {
+    pub fn new(viewport: Viewport<u32>) -> Self {
+        Canvas {
+            viewport: viewport,
+        }
+    }
+
     pub fn set_background(&mut self, NormalizedRGBA(r,g,b,a): NormalizedRGBA) {
         unsafe {
             gl::ClearColor(r,g,b,a)
@@ -17,6 +27,7 @@ impl Canvas
     }
 
     pub fn clear(&self) {
+        self.pre_render();
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
@@ -24,6 +35,7 @@ impl Canvas
 
     pub fn draw_mesh(&self, mesh: &gfx::gl::mesh::Data, program: &gfx::gl::Program) {
 
+        self.pre_render();
         program.enable();
 
         for buffer in mesh.buffers() {
@@ -69,6 +81,17 @@ impl Canvas
         }
 
         program.disable();
+    }
+
+    fn pre_render(&self) {
+        use gfx::Viewport;
+
+        let (x,y) = self.viewport.top_left();
+        let (width,height) = self.viewport.dimensions();
+        unsafe {
+            gl::Viewport(x as i32, y as i32,
+                         width as i32, height as i32);
+        }
     }
 }
 
