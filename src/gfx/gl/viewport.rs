@@ -1,42 +1,32 @@
 
 use gfx;
 use gfx::gl;
-use num::Num;
 
 /// A rectangular portion of the screen.
-pub struct Viewport<T>
+#[derive(Clone,Eq,PartialEq,Debug)]
+pub struct Viewport
 {
-    center: (T,T),
-    half_extents: (T,T),
+    center: (u32,u32),
+    half_extents: (u32,u32),
 }
 
-impl<T: Num> Viewport<T>
+impl gfx::Viewport<u32> for Viewport
 {
-    /// Gets a viewport filling the entier area.
-    pub fn entire_area() -> Self {
-        Viewport {
-            center: (T::zero(),T::zero()),
-            half_extents: (T::one(),T::one()),
-        }
-    }
+    type Canvas = gl::Canvas;
 
     /// Creates a new viewport.
-    pub fn new(center: (T,T), half_extents: (T,T)) -> Self {
+    fn new(center: (u32,u32), half_extents: (u32,u32)) -> Self {
         Viewport {
             center: center,
             half_extents: half_extents,
         }
     }
-}
 
-impl<T: Num> gfx::Viewport<T> for Viewport<T>
-{
-    type Canvas = gl::Canvas;
 
-    fn center(&self) -> (T,T) { self.center }
-    fn half_extents(&self) -> (T,T) { self.half_extents }
+    fn center(&self) -> (u32,u32) { self.center }
+    fn half_extents(&self) -> (u32,u32) { self.half_extents }
 
-    fn begin(&self) -> gl::Canvas {
-        unimplemented!();
+    fn begin(self) -> gl::Canvas {
+        gl::Canvas::new(self)
     }
 }

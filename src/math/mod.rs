@@ -17,3 +17,10 @@ pub use self::quaternion::Quaternion;
 
 /// A scalar.
 pub type Scalar = f32;
+
+/// A 2D axis.
+pub enum Axis2
+{
+    Horizontal,
+    Vertical,
+}

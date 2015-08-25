@@ -9,12 +9,12 @@ use std::ptr;
 
 pub struct Canvas
 {
-    viewport: Viewport<u32>,
+    viewport: Viewport,
 }
 
 impl Canvas
 {
-    pub fn new(viewport: Viewport<u32>) -> Self {
+    pub fn new(viewport: Viewport) -> Self {
         Canvas {
             viewport: viewport,
         }
