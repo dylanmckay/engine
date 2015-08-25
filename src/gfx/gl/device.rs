@@ -1,5 +1,5 @@
 
-use gfx::gl::{self};
+use gfx::{self,gl};
 use libgl;
 use geom;
 
@@ -30,6 +30,33 @@ impl<B: gl::Backend> Device<B>
 
     pub fn end(&mut self) {
         self.backend.end()
+    }
+
+    /// Enables culling.
+    pub fn enable_culling(&mut self) {
+        unsafe {
+            libgl::Enable(libgl::CULL_FACE);
+            // Use clockwise vertices as front,
+            libgl::FrontFace(libgl::CW);
+        }
+    }
+
+    /// Disables culling.
+    pub fn disable_culling(&mut self) {
+        unsafe {
+            libgl::Disable(libgl::CULL_FACE);
+        }
+    }
+
+    /// Sets the culling mode.
+    /// This enables culling if it is disabled.
+    pub fn set_culling_mode(&mut self, mode: gfx::CullingMode) {
+        let mode_enum = gl::util::culling_mode(mode);
+
+        self.enable_culling();
+        unsafe {
+            libgl::CullFace(mode_enum);
+        }
     }
 
     pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::Data<I,V>)
