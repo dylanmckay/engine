@@ -68,6 +68,7 @@ fn main() {
         gfx::gl::shader::Program::link(shaders).unwrap()
     };
 
+    device.set_title("Engine Test");
     device.set_culling_mode(gfx::CullingMode::Back);
 
     let mesh = device.load_mesh_data(&mesh_data);

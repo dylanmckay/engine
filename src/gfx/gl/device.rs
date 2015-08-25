@@ -32,6 +32,11 @@ impl<B: gl::Backend> Device<B>
         self.backend.end()
     }
 
+    /// Gets the dimensions in pixels.
+    pub fn dimensions(&self) -> (u32,u32) {
+        self.backend.dimensions()
+    }
+
     /// Enables culling.
     pub fn enable_culling(&mut self) {
         unsafe {
@@ -59,10 +64,18 @@ impl<B: gl::Backend> Device<B>
         }
     }
 
+    /// Loads mesh data.
     pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::Data<I,V>)
         -> gl::mesh::Data
         where I: gl::Type, V: gl::Vertex {
         gl::mesh::Data::new().load(data, libgl::STATIC_DRAW)
+    }
+
+    /// Sets the title.
+    /// This operation is not always supported. If this is the case, this
+    /// function does nothing.
+    pub fn set_title(&mut self, title: &str) {
+        self.backend.set_title(title);
     }
 }
 
