@@ -1,5 +1,5 @@
 
-#![feature(float_extras)]
+#![feature(float_extras,concat_idents)]
 
 extern crate libc;
 extern crate gl as libgl;

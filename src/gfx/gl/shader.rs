@@ -183,7 +183,7 @@ pub mod uniform
     use math;
     use gfx::gl::Program;
     use gfx::gl::gl::types::*;
-    use gfx::gl::gl;
+    use gfx::gl::gl::*;
 
     /// An OpenGL shader uniform.
     pub struct Uniform<'a> {
@@ -210,40 +210,76 @@ pub mod uniform
         }
     }
 
+    macro_rules! impl_type {
+        ($ty:ty, $suffix:ident) => {
+            impl Type for $ty {
+                fn set(loc: GLint, val: $ty) {
+                    let f = concat_idents!(Uniform1, $suffix);
+                    unsafe { f(loc, val) }
+                }
+            }
+            impl Type for ($ty,$ty) {
+                fn set(loc: GLint, (v0,v1): ($ty,$ty)) {
+                    let f = concat_idents!(Uniform2, $suffix);
+                    unsafe { f(loc, v0, v1) }
+                }
+            }
+            impl Type for ($ty,$ty,$ty) {
+                fn set(loc: GLint, (v0,v1,v2): ($ty,$ty,$ty)) {
+                    let f = concat_idents!(Uniform3, $suffix);
+                    unsafe { f(loc, v0, v1, v2) }
+                }
+            }
+            impl Type for ($ty,$ty,$ty,$ty) {
+                fn set(loc: GLint, (v0,v1,v2,v3): ($ty,$ty,$ty,$ty)) {
+                    let f = concat_idents!(Uniform4, $suffix);
+                    unsafe { f(loc, v0, v1, v2, v3) }
+                }
+            }
+            impl<'a> Type for &'a [$ty] {
+                fn set(loc: GLint, vals: &'a [$ty]) {
+                    let f = concat_idents!(Uniform1, $suffix, v);
+                    unsafe { f(loc, vals.len() as GLsizei, vals.as_ptr()) }
+                }
+            }
+            impl<'a> Type for &'a [($ty,$ty)] {
+                fn set(loc: GLint, vals: &'a [($ty,$ty)]) {
+                    let f = concat_idents!(Uniform2, $suffix, v);
+                    let ptr = vals.as_ptr() as *const $ty;
+                    unsafe { f(loc, vals.len() as GLsizei, ptr) }
+                }
+            }
+            impl<'a> Type for &'a [($ty,$ty,$ty)] {
+                fn set(loc: GLint, vals: &'a [($ty,$ty,$ty)]) {
+                    let f = concat_idents!(Uniform3, $suffix, v);
+                    let ptr = vals.as_ptr() as *const $ty;
+                    unsafe { f(loc, vals.len() as GLsizei, ptr) }
+                }
+            }
+            impl<'a> Type for &'a [($ty,$ty,$ty,$ty)] {
+                fn set(loc: GLint, vals: &'a [($ty,$ty,$ty,$ty)]) {
+                    let f = concat_idents!(Uniform4, $suffix, v);
+                    let ptr = vals.as_ptr() as *const $ty;
+                    unsafe { f(loc, vals.len() as GLsizei, ptr) }
+                }
+            }
+        }
+    }
+
+    impl_type!(f32, f);
+    impl_type!(i32, i);
+    impl_type!(u32, ui);
+
     /// A type that can be used in a uniform.
-    // TODO: Implement for all values
+    // TODO: Implement this for all matrix types.
     pub trait Type
     {
         fn set(loc: GLint, val: Self);
     }
 
-    impl Type for f32 {
-        fn set(loc: GLint, val: f32) {
-            unsafe { gl::Uniform1f(loc, val) }
-        }
-    }
-
-    impl Type for (f32,f32) {
-        fn set(loc: GLint, (v1,v2): (f32,f32)) {
-            unsafe { gl::Uniform2f(loc, v1, v2) }
-        }
-    }
-
-    impl Type for (f32,f32,f32) {
-        fn set(loc: GLint, (v1,v2,v3): (f32,f32,f32)) {
-            unsafe { gl::Uniform3f(loc, v1, v2, v3) }
-        }
-    }
-
-    impl Type for (f32,f32,f32,f32) {
-        fn set(loc: GLint, (v1,v2,v3,v4): (f32,f32,f32,f32)) {
-            unsafe { gl::Uniform4f(loc, v1, v2, v3, v4) }
-        }
-    }
-
     impl Type for math::Vector3<f32> {
         fn set(loc: GLint, math::Vector3(v1,v2,v3): math::Vector3<f32>) {
-            unsafe { gl::Uniform3f(loc, v1,v2,v3) }
+            unsafe { Uniform3f(loc, v1,v2,v3) }
         }
     }
 
@@ -251,7 +287,7 @@ pub mod uniform
         fn set(loc: GLint, mat: math::Matrix4<f32>) {
             use math::Matrix;
             let data = mat.as_slice();
-            unsafe { gl::UniformMatrix4fv(loc, 1, gl::TRUE, data.as_ptr()) }
+            unsafe { UniformMatrix4fv(loc, 1, TRUE, data.as_ptr()) }
         }
     }
 }
