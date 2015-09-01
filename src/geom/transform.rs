@@ -1,5 +1,5 @@
 
-use math::{self,Vector3,Matrix,Matrix3,Matrix4};
+use math::{self,Vector2,Vector3,Matrix,Matrix3,Matrix4};
 use num::{self,Num,Decimal};
 
 /// A 3D transformation.
@@ -10,6 +10,25 @@ pub type Rotation3<T> = Matrix3<T>;
 
 impl<T: Num> Transform3<T>
 {
+    pub fn perspective(fov: T, near: T, far: T, aspect: T) -> Self
+        where T: Decimal + num::Signed {
+
+        let fov_scale = num::one::<T>() / fov.tan();
+
+        let m11 = fov_scale / aspect;
+        let m22 = fov_scale;
+
+        let m33 = -far / (far-near);
+        let m43 = -(far*near)/(far-near);
+
+        Transform3::new(
+            m11,         num::zero(), num::zero(), num::zero(),
+            num::zero(), m22,         num::zero(), num::zero(),
+            num::zero(), num::zero(), m33,        -num::one::<T>(),
+            num::zero(), num::zero(), m43,         num::one()
+        )
+    }
+
     pub fn translate(self, offset: Vector3<T>) -> Self {
         let cur_offset = self.get_translation();
         self.set_translation(cur_offset + offset)
@@ -36,7 +55,7 @@ impl<T: Num> Transform3<T>
 
     pub fn scale(self, factor: Vector3<T>) -> Self {
         let cur_scale = self.get_scale();
-        self.set_scale(cur_scale + factor)
+        self.set_scale(cur_scale * factor)
     }
 
     pub fn get_scale(&self) -> Vector3<T> {

@@ -99,5 +99,10 @@ impl Canvas
                         width as i32, height as i32);
         }
     }
+
+    /// Gets the viewport associated with the canvas.
+    pub fn viewport<'a>(&'a self) -> &'a Viewport {
+        &self.viewport
+    }
 }
 

@@ -11,9 +11,11 @@ pub mod geom;
 pub mod gfx;
 
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
-const MODEL_DATA: &'static str = include_str!("../res/model.obj");
+const MODEL_DATA: &'static str = include_str!("../res/unit_cube.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
+
+const BLOCK_SIZE: f32 = 0.005;
 
 #[repr(packed)]
 pub struct Vertex {
@@ -49,6 +51,74 @@ pub struct Context
     mesh: gfx::gl::mesh::Data,
 
     clock: f32,
+
+    chunk: Chunk,
+}
+
+pub struct Chunk
+{
+    blocks: [[[Block; 15]; 15]; 15],
+}
+
+impl Chunk
+{
+    pub fn from_fn<F>(f: F) -> Self
+        where F: Fn(u32,u32,u32) -> Block {
+        let mut blocks = [[[Block::Empty; 15]; 15]; 15];
+
+        for x in 0..15 {
+            for y in 0..15 {
+                for z in 0..15 {
+                    blocks[x as usize][y as usize][z as usize] = f(x,y,z);
+                }
+            }
+        }
+
+        Chunk {
+            blocks: blocks,
+        }
+
+    }
+
+    pub fn set(&mut self, (x,y,z): (u32,u32,u32), block: Block) {
+        self.blocks[x as usize][y as usize][z as usize] = block;
+    }
+
+    pub fn get(&mut self, (x,y,z): (u32,u32,u32)) -> Block {
+        self.blocks[x as usize][y as usize][z as usize]
+    }
+
+    pub fn render(&self, context: &Context, canvas: &mut gfx::gl::Canvas) {
+        use math::Matrix;
+        for (xi,a) in self.blocks.iter().enumerate() {
+            for (yi,b) in a.iter().enumerate() {
+                for (zi,block) in b.iter().enumerate() {
+
+                    match *block {
+                        Block::Square((r,g,b)) => {
+                            let x = xi as f32 * BLOCK_SIZE;
+                            let y = yi as f32 * BLOCK_SIZE;
+                            let z = zi as f32 * BLOCK_SIZE;
+                            let transform = geom::Transform3::identity()
+                                           .translate(math::Vector3(x,y,z));
+
+                            context.program.uniform("modelTransform").set(transform);
+
+                            canvas.draw_mesh(&context.mesh, &context.program);
+                        },
+                        Block::Empty => { },
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[derive(Copy,Clone)]
+pub enum Block
+{
+    Square((f32,f32,f32)),
+    Empty,
 }
 
 impl Context
@@ -86,11 +156,20 @@ impl Context
         let light_pos = math::Vector3(0.886,1.0,0.);
         program.uniform("lightPosition").set(light_pos);
 
+        let chunk = Chunk::from_fn(|x,y,z| {
+            if x%2 == 0 {
+                Block::Square( (1.0/x as f32, 1.0/y as f32, 1.0/z as f32) )
+            } else {
+                Block::Empty
+            }
+        });
+
         Context {
             device: device,
             program: program,
             mesh: mesh,
             clock: 0.0,
+            chunk: chunk,
         }
     }
 
@@ -100,15 +179,8 @@ impl Context
 
         self.device.run();
 
-        let (v1,v2) = self.device.area().split_half(math::Axis2::Vertical);
-        let (v3,v4) = v2.split_half(math::Axis2::Horizontal);
-        let mut canvas1 = v1.begin();
-        let mut canvas2 = v3.begin();
-        let mut canvas3 = v4.begin();
-
-        self.render(&mut canvas1);
-        self.render(&mut canvas2);
-        self.render(&mut canvas3);
+        let mut canvas = self.device.begin();
+        self.render(&mut canvas);
 
         self.device.end();
 
@@ -117,24 +189,23 @@ impl Context
 
     fn render(&self, canvas: &mut gfx::gl::Canvas) {
         use math::Matrix;
+        use gfx::Viewport;
 
         canvas.set_background(BACKGROUND);
 
         canvas.clear();
 
-        let y = self.clock.sin();
         let transform = geom::Transform3::identity()
-//                        .scale(math::Vector3(y,y,y))
-//                      .translate(math::Vector3(0.0,y,0.0));
-                        .rotate(math::Vector3(y*0.2,y,0.0));
+                    .scale(math::Vector3(0.5,0.5,0.5));
+        //                .translate(math::Vector3(0.0,y,0.0));
+         //               .rotate(math::Vector3(y*0.2,y,0.0));
 
 
 
-        self.program.uniform("worldTransform").set(transform);
+        let projection = geom::Transform3::perspective(45.0, 0.0, 15.0, canvas.viewport().aspect());
+        self.program.uniform("worldTransform").set(projection);
 
-        canvas.draw_mesh(&self.mesh, &self.program);
-
-
+        self.chunk.render(self, canvas);
     }
 }
 

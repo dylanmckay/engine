@@ -2,7 +2,7 @@
 
 pub mod gl;
 
-use num::Num;
+use num::{self,Num};
 use math;
 
 /// A rectangular region of the screen.
@@ -39,6 +39,15 @@ pub trait Viewport<T: Num> : Sized + Clone
         let two = T::one()+T::one();
         let (hx,hy) = self.half_extents();
         (hx*two, hy*two)
+    }
+
+    /// Gets the aspect ratio of the viewport.
+    fn aspect(&self) -> f32
+        where T: num::Cast<f32> {
+        let (hw,hh) = self.half_extents();
+        let (a,b): (f32,f32) = (num::cast(hw),num::cast(hh));
+
+        a/b
     }
 
     fn split_half(&self, axis: math::Axis2) -> (Self,Self) {

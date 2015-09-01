@@ -370,7 +370,7 @@ impl_bounded!(f64, std::f64::MIN, std::f64::MAX);
 
 /// Casts a number to another type.
 pub fn cast<T,V>(from: T) -> V
-    where T: NumCast, V: NumCast {
+    where T: CastNum, V: NumCast {
     V::from(from)
 }
 
