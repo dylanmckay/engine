@@ -5,7 +5,8 @@ pub use self::keyboard::{NumberSource,Side,Key};
 #[derive(Copy,Clone,Debug)]
 pub enum Event
 {
-    Key(Key, Action),
+    /// A keyboard event.
+    Keyboard(keyboard::Event),
     /// A mouse event.
     Mouse(mouse::Event),
 }
@@ -34,7 +35,7 @@ impl State
     pub fn process(&mut self, event: &Event) {
         match *event {
             Event::Mouse(e) => self.mouse.process(e),
-            Event::Key(key, action) => unimplemented!(),
+            Event::Keyboard(e) => unimplemented!(),
         }
     }
 }
@@ -48,9 +49,16 @@ pub enum Action
 
 pub mod keyboard
 {
-    use std;
-    use std::fmt;
+    use super::Action;
+    use std::{self,fmt};
     use std::collections::LinkedList;
+
+    /// A keyboard event.
+    #[derive(Copy,Clone,Debug,Eq,PartialEq)]
+    pub enum Event
+    {
+        Key(Key, Action),
+    }
 
     /// Holds keyboard state.
     #[derive(Clone,Default,Debug,PartialEq,Eq)]

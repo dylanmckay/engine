@@ -101,7 +101,9 @@ pub mod util
                     None => { return None; },
                 };
 
-                Some(Event::Key(key, action))
+                Some(Event::Keyboard(
+                    input::keyboard::Event::Key(key, action))
+                )
 
             },
             glfw::WindowEvent::MouseButton(gbutton, gaction, _) => {

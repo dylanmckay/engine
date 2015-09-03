@@ -199,21 +199,25 @@ impl Context
         use gfx::input::{Key,Action};
 
         match event {
-            gfx::input::Event::Key(key,action) => {
-                match (key,action) {
-                    (Key::Up,Action::Press) => {
-                        self.camera_pos = self.camera_pos + math::Vector3(0.,MOVE_STEP,0.);
-                    },
-                    (Key::Down,Action::Press) => {
-                        self.camera_pos = self.camera_pos - math::Vector3(0.,MOVE_STEP,0.);
-                    },
-                    (Key::Left,Action::Press) => {
-                        self.camera_pos = self.camera_pos - math::Vector3(MOVE_STEP,0.,0.);
-                    },
-                    (Key::Right,Action::Press) => {
-                        self.camera_pos = self.camera_pos + math::Vector3(MOVE_STEP,0.,0.);
-                    },
-                    _ => (),
+            gfx::input::Event::Keyboard(e) => {
+                match e {
+                    gfx::input::keyboard::Event::Key(key,action) => {
+                        match (key,action) {
+                            (Key::Up,Action::Press) => {
+                                self.camera_pos = self.camera_pos + math::Vector3(0.,MOVE_STEP,0.);
+                            },
+                            (Key::Down,Action::Press) => {
+                                self.camera_pos = self.camera_pos - math::Vector3(0.,MOVE_STEP,0.);
+                            },
+                            (Key::Left,Action::Press) => {
+                                self.camera_pos = self.camera_pos - math::Vector3(MOVE_STEP,0.,0.);
+                            },
+                            (Key::Right,Action::Press) => {
+                                self.camera_pos = self.camera_pos + math::Vector3(MOVE_STEP,0.,0.);
+                            },
+                            _ => (),
+                        }
+                    }
                 }
             },
             gfx::input::Event::Mouse((kind,info)) => {
