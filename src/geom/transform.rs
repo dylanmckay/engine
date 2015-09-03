@@ -1,5 +1,5 @@
 
-use math::{self,Vector2,Vector3,Matrix,Matrix3,Matrix4};
+use math::{self,Vector3,Matrix,Matrix3,Matrix4};
 use num::{self,Num,Decimal};
 
 /// A 3D transformation.

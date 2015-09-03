@@ -6,7 +6,6 @@ use gfx::gl;
 use gfx::input::Event;
 
 use std::sync::mpsc::Receiver;
-use std::collections::LinkedList;
 
 /// A GLFW OpenGL backend.
 pub struct Backend
@@ -47,13 +46,13 @@ impl Backend
 
 impl gfx::gl::Backend for Backend
 {
-    fn run(&mut self, events: &mut LinkedList<Event>) {
+    fn run(&mut self, events: &mut Vec<Event>) {
         self.glfw.poll_events();
 
         for (_,event) in glfw::flush_messages(&self.events) {
             match self::util::into_event(event, &self.window) {
                 Some(e) => {
-                    events.push_back(e);
+                    events.push(e);
                 },
                 None => (),
             }
@@ -127,7 +126,7 @@ pub mod util
                 let pos = map_pixel_to_point((x,y), window.get_size());
 
                 let info = input::mouse::Info {
-                    pos: pos,
+                    position: pos,
                 };
                 
                 let event = (input::mouse::Kind::Move, info);
@@ -293,7 +292,6 @@ pub mod util
     pub fn create_mouse_event(kind: input::mouse::Kind,
                               window: &glfw::Window)
         -> input::mouse::Event {
-        use num::Cast;
 
         // get cursor pos as relatie position
         let pixel_pos = window.get_cursor_pos();
@@ -301,7 +299,7 @@ pub mod util
         let pos = map_pixel_to_point(pixel_pos, window.get_size());
 
         let info = input::mouse::Info {
-            pos: pos,
+            position: pos,
         };
 
         (kind, info)

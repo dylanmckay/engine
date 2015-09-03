@@ -98,7 +98,7 @@ impl Chunk
                 for (zi,block) in b.iter().enumerate() {
 
                     match *block {
-                        Block::Square((r,g,b)) => {
+                        Block::Square((_,_,_)) => {
                             let x = xi as f32 * BLOCK_SIZE;
                             let y = yi as f32 * BLOCK_SIZE;
                             let z = zi as f32 * BLOCK_SIZE;
@@ -222,7 +222,7 @@ impl Context
                         match (button,action) {
                             (gfx::input::mouse::Button::Left, gfx::input::Action::Press) => {
 
-                                println!("left at {:?}", info.pos);
+                                println!("left at {:?}", info.position());
                             },
                             _ => {
 
@@ -230,7 +230,7 @@ impl Context
                         }
                     },
                     gfx::input::mouse::Kind::Move => {
-                        println!("Position: {:?}", info.pos);
+                        println!("Position: {:?}", info.position());
                     },
                 }
             },

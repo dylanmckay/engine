@@ -1,6 +1,6 @@
 
 
-use num::{self,Cast};
+use num;
 
 /// Maps from normalized window coordinates to pixel coordinates.
 pub fn map_point_to_pixel<T>(point: (T,T),

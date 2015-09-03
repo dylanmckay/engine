@@ -10,7 +10,36 @@ pub enum Event
     Mouse(mouse::Event),
 }
 
-#[derive(Copy,Clone,Debug)]
+/// The current input device states.
+#[derive(Clone,Default,Debug)]
+pub struct State
+{
+    keyboard: keyboard::State,
+    mouse: mouse::State,
+}
+
+impl State
+{
+    /// Gets the state of the keyboard.
+    pub fn keyboard<'a>(&'a self) -> &'a keyboard::State {
+        &self.keyboard
+    }
+
+    /// Gets the state of the mouse.
+    pub fn mouse<'a>(&'a self) -> &'a mouse::State {
+        &self.mouse
+    }
+
+    /// Processes an event and updates the state accordingly.
+    pub fn process(&mut self, event: &Event) {
+        match *event {
+            Event::Mouse(e) => self.mouse.process(e),
+            Event::Key(key, action) => unimplemented!(),
+        }
+    }
+}
+
+#[derive(Copy,Clone,Debug,PartialEq,Eq)]
 pub enum Action
 {
     Press,
@@ -19,10 +48,33 @@ pub enum Action
 
 pub mod keyboard
 {
+    use std;
     use std::fmt;
+    use std::collections::LinkedList;
+
+    /// Holds keyboard state.
+    #[derive(Clone,Default,Debug,PartialEq,Eq)]
+    pub struct State
+    {
+        pressed: LinkedList<Key>,
+    }
+
+    impl State
+    {
+        /// Checks if a key is pressed.
+        pub fn pressed(&self, key: Key) -> bool {
+            self.pressed.iter().any(|&a| a==key)
+        }
+
+        /// Gets an iterator over the pressed keys.
+        pub fn pressed_keys<'a>(&'a self)
+            -> std::collections::linked_list::Iter<'a, Key> {
+            self.pressed.iter()
+        }
+    }
 
     /// The source of a number-related key.
-    #[derive(Copy,Clone,Debug)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
     pub enum NumberSource
     {
         /// The horizontal number row.
@@ -32,14 +84,14 @@ pub mod keyboard
     }
 
     /// The side of the keyboard that was pressed.
-    #[derive(Copy,Clone,Debug)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
     pub enum Side
     {
         Left,
         Right,
     }
 
-    #[derive(Copy,Clone,Debug)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
     pub enum Key
     {
         Space,
@@ -182,9 +234,59 @@ pub mod keyboard
 pub mod mouse
 {
     use super::Action;
+    use std;
+
+    /// Holds mouse state.
+    #[derive(Clone,Default,Debug)]
+    pub struct State
+    {
+        position: (f32,f32),
+        pressed_buttons: Vec<Button>,
+    }
+
+    impl State
+    {
+        /// Gets the position of the mouse.
+        pub fn position(&self) -> (f32,f32) { self.position }
+
+        /// Checks if a button is pressed.
+        pub fn pressed(&self, button: Button) -> bool {
+            self.pressed_buttons.contains(&button)
+        }
+
+        /// Gets the buttons that are pressed.
+        pub fn pressed_buttons<'a>(&'a self) -> std::slice::Iter<'a,Button> {
+            self.pressed_buttons.iter()
+        }
+
+        pub fn process(&mut self, (kind,info): Event) {
+            self.position = info.position();
+            match kind {
+                Kind::Move => (), // do nothing, we already set the position
+                Kind::Button(button, action) => {
+                    match action {
+                        Action::Press => {
+                            debug_assert!(!self.pressed_buttons.contains(&button),
+                                          "button cannot be pressed while it already is");
+
+                            self.pressed_buttons.push(button);
+                        },
+                        Action::Release => {
+                            debug_assert!(self.pressed_buttons.contains(&button),
+                                          "button should already be pressed");
+
+                            let idx = self.pressed_buttons.iter().position(|&b| b==button).unwrap();
+                            self.pressed_buttons.remove(idx);
+                        },
+                    }
+                },
+            }
+
+        }
+    }
 
     /// A mouse event.
-    #[derive(Copy,Clone,Debug)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
     pub enum Kind
     {
         /// A button was pressed or released.
@@ -197,11 +299,16 @@ pub mod mouse
     /// Information about a mouse event.
     #[derive(Copy,Clone,Debug)]
     pub struct Info {
-        pub pos: (f32,f32),
+        pub position: (f32,f32),
+    }
+
+    impl Info
+    {
+        pub fn position(&self) -> (f32,f32) { self.position }
     }
 
     /// Specifies a mouse button.
-    #[derive(Copy,Clone,Debug)]
+    #[derive(Copy,Clone,Debug,Eq,PartialEq)]
     pub enum Button {
         Left,
         Middle,

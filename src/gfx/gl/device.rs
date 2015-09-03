@@ -1,6 +1,6 @@
 
 use gfx::{self,gl,util};
-use gfx::input::Event;
+use gfx::input::{self,Event};
 use libgl;
 use geom;
 
@@ -10,6 +10,7 @@ pub struct Device<B: gl::Backend>
 {
     backend: B,
     event_queue: LinkedList<Event>,
+    input_state: input::State,
 }
 
 impl<B: gl::Backend> Device<B>
@@ -18,12 +19,19 @@ impl<B: gl::Backend> Device<B>
         Device {
             backend: backend,
             event_queue: LinkedList::new(),
+            input_state: Default::default(),
         }
     }
 
     pub fn run(&mut self) {
-        let mut queue = &mut self.event_queue;
-        self.backend.run(queue)
+
+        let mut tmp = Vec::new();
+        self.backend.run(&mut tmp);
+
+        for event in tmp {
+            self.input_state.process(&event);
+            self.event_queue.push_front(event);
+        }
     }
 
     pub fn is_open(&self) -> bool {
@@ -120,6 +128,11 @@ impl<B: gl::Backend> Device<B>
         Events {
             queue: queue,
         }
+    }
+
+    /// Gets the current input state.
+    pub fn inputs<'a>(&'a self) -> &'a input::State {
+        &self.input_state
     }
 }
 

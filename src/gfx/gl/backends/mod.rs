@@ -2,14 +2,13 @@
 pub mod glfw;
 
 use gfx::input::Event;
-use std::collections::LinkedList;
 
 /// The default window title.
 const DEFAULT_TITLE: &'static str = "Engine";
 
 pub trait Backend
 {
-    fn run(&mut self, events: &mut LinkedList<Event>);
+    fn run(&mut self, events: &mut Vec<Event>);
     fn end(&mut self);
     fn is_open(&self) -> bool;
     /// Gets the width and height in pixels.
