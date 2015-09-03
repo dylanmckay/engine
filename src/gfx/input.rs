@@ -189,6 +189,7 @@ pub mod mouse
     {
         /// A button was pressed or released.
         Button(Button, Action),
+        Move,
     }
 
     pub type Event = (Kind,Info);

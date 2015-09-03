@@ -8,6 +8,7 @@ use gfx::input::Event;
 use std::sync::mpsc::Receiver;
 use std::collections::LinkedList;
 
+/// A GLFW OpenGL backend.
 pub struct Backend
 {
     glfw: glfw::Glfw,
@@ -32,6 +33,7 @@ impl Backend
 
         window.set_key_polling(true);
         window.set_mouse_button_polling(true);
+        window.set_cursor_pos_polling(true);
 
         window.make_current();
 
@@ -80,6 +82,7 @@ impl gfx::gl::Backend for Backend
 /// Useful utilities.
 pub mod util
 {
+    use gfx;
     use super::glfw;
     use gfx::input::{self,Event};
 
@@ -118,6 +121,18 @@ pub mod util
 
                 Some(input::Event::Mouse(mouse_event))
 
+            },
+            glfw::WindowEvent::CursorPos(x,y) => {
+
+                let pos = map_pixel_to_point((x,y), window.get_size());
+
+                let info = input::mouse::Info {
+                    pos: pos,
+                };
+                
+                let event = (input::mouse::Kind::Move, info);
+
+                Some(input::Event::Mouse(event))
             },
             _ => unimplemented!(),
         }
@@ -278,13 +293,28 @@ pub mod util
     pub fn create_mouse_event(kind: input::mouse::Kind,
                               window: &glfw::Window)
         -> input::mouse::Event {
+        use num::Cast;
+
         // get cursor pos as relatie position
-        let (x,y) = window.get_cursor_pos();
+        let pixel_pos = window.get_cursor_pos();
+
+        let pos = map_pixel_to_point(pixel_pos, window.get_size());
 
         let info = input::mouse::Info {
-            pos: (x as f32, y as f32),
+            pos: pos,
         };
 
         (kind, info)
+    }
+
+    pub fn map_pixel_to_point(point: (f64,f64),
+                              dimensions: (i32, i32))
+        -> (f32,f32) {
+        use num::Cast;
+
+        let real_point: (f32,f32) = point.cast();
+        let dimensions: (f32,f32) = dimensions.cast();
+
+        gfx::util::map_pixel_to_point(real_point, dimensions)
     }
 }

@@ -115,6 +115,16 @@ pub trait Bounded
     fn max() -> Self;
 }
 
+// TODO: impl for more tuple types
+impl<T,V> Cast<(V,V)> for (T,T)
+    where T: Cast<V>
+{
+    fn cast(self) -> (V,V) {
+        (self.0.cast(), self.1.cast())
+    }
+}
+ 
+
 macro_rules! impl_cast {
     ($ty:ident, $to:ident) => {
         impl Cast<$to> for $ty {

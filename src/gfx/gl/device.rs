@@ -1,5 +1,5 @@
 
-use gfx::{self,gl};
+use gfx::{self,gl,util};
 use gfx::input::Event;
 use libgl;
 use geom;
@@ -95,17 +95,19 @@ impl<B: gl::Backend> Device<B>
         self.backend.set_title(title);
     }
 
-    /// Maps from window coordinates to pixel coordinates.
+    /// Maps from normalized window coordinates to pixel coordinates.
     pub fn map_point_to_pixel(&self, point: (f32,f32)) -> (u32,u32) {
-        let (half_width,half_height) = match self.dimensions() {
-            (w,h) => (w as f32 / 2.0, h as f32 / 2.0),
-        };
+        use num::Cast;
 
-        let (x,y) = point;
-        let pixel_x = half_width * (x+1.);
-        let pixel_y = half_height * (y+1.);
+        let dimensions: (f32,f32) = self.dimensions().cast();
+        util::map_point_to_pixel(point, dimensions).cast()
+    }
 
-        (pixel_x as u32, pixel_y as u32)
+    /// Maps from pixel coordinates to normalized window coordinates.
+    pub fn map_pixel_to_point(&self, point: (u32,u32)) -> (f32,f32) {
+        use num::Cast;
+
+        util::map_pixel_to_point(point, self.dimensions()).cast()
     }
 
     /// Gets an iterator of events.

@@ -222,13 +222,16 @@ impl Context
                         match (button,action) {
                             (gfx::input::mouse::Button::Left, gfx::input::Action::Press) => {
 
-                                println!("left!");
+                                println!("left at {:?}", info.pos);
                             },
                             _ => {
 
                             },
                         }
-                    }
+                    },
+                    gfx::input::mouse::Kind::Move => {
+                        println!("Position: {:?}", info.pos);
+                    },
                 }
             },
         }

@@ -2,6 +2,7 @@
 pub mod input;
 
 pub mod gl;
+pub mod util;
 
 use num::{self,Num};
 use math;
