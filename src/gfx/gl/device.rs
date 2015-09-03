@@ -1,11 +1,15 @@
 
 use gfx::{self,gl};
+use gfx::input::Event;
 use libgl;
 use geom;
+
+use std::collections::LinkedList;
 
 pub struct Device<B: gl::Backend>
 {
     backend: B,
+    event_queue: LinkedList<Event>,
 }
 
 impl<B: gl::Backend> Device<B>
@@ -13,11 +17,13 @@ impl<B: gl::Backend> Device<B>
     pub fn new(backend: B) -> Self {
         Device {
             backend: backend,
+            event_queue: LinkedList::new(),
         }
     }
 
     pub fn run(&mut self) {
-        self.backend.run()
+        let mut queue = &mut self.event_queue;
+        self.backend.run(queue)
     }
 
     pub fn is_open(&self) -> bool {
@@ -101,6 +107,30 @@ impl<B: gl::Backend> Device<B>
 
         (pixel_x as u32, pixel_y as u32)
     }
+
+    /// Gets an iterator of events.
+    pub fn events(&mut self) -> Events {
+        use std::mem;
+
+        let mut queue = LinkedList::new();
+        mem::swap(&mut queue, &mut self.event_queue);
+
+        Events {
+            queue: queue,
+        }
+    }
 }
 
+pub struct Events
+{
+    queue: LinkedList<Event>,
+}
 
+impl Iterator for Events
+{
+    type Item = Event;
+
+    fn next(&mut self) -> Option<Event> {
+        self.queue.pop_front()
+    }
+}

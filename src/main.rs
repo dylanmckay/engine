@@ -16,6 +16,7 @@ const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 
 const BLOCK_SIZE: f32 = 0.005;
+const MOVE_STEP: f32 = 0.2;
 
 #[repr(packed)]
 pub struct Vertex {
@@ -53,6 +54,8 @@ pub struct Context
     clock: f32,
 
     chunk: Chunk,
+
+    camera_pos: math::Vector3,
 }
 
 pub struct Chunk
@@ -170,6 +173,7 @@ impl Context
             mesh: mesh,
             clock: 0.0,
             chunk: chunk,
+            camera_pos: math::Vector3(0.,0.,0.),
         }
     }
 
@@ -179,12 +183,40 @@ impl Context
 
         self.device.run();
 
+        for event in self.device.events() {
+            self.handle_event(event)
+        }
+
         let mut canvas = self.device.begin();
         self.render(&mut canvas);
 
         self.device.end();
 
         self.clock += 0.05;
+    }
+
+    fn handle_event(&mut self, event: gfx::input::Event) {
+        use gfx::input::{Key,Action};
+
+        match event {
+            gfx::input::Event::Key(key,action) => {
+                match (key,action) {
+                    (Key::Up,Action::Press) => {
+                        self.camera_pos = self.camera_pos + math::Vector3(0.,MOVE_STEP,0.);
+                    },
+                    (Key::Down,Action::Press) => {
+                        self.camera_pos = self.camera_pos - math::Vector3(0.,MOVE_STEP,0.);
+                    },
+                    (Key::Left,Action::Press) => {
+                        self.camera_pos = self.camera_pos - math::Vector3(MOVE_STEP,0.,0.);
+                    },
+                    (Key::Right,Action::Press) => {
+                        self.camera_pos = self.camera_pos + math::Vector3(MOVE_STEP,0.,0.);
+                    },
+                    _ => (),
+                }
+            },
+        }
     }
 
     fn render(&self, canvas: &mut gfx::gl::Canvas) {
@@ -195,15 +227,16 @@ impl Context
 
         canvas.clear();
 
-        let transform = geom::Transform3::identity()
-                    .scale(math::Vector3(0.5,0.5,0.5));
-        //                .translate(math::Vector3(0.0,y,0.0));
+        let camera_transform = geom::Transform3::identity()
+                               .scale(math::Vector3(0.5,0.5,0.5))
+                               .translate(self.camera_pos);
          //               .rotate(math::Vector3(y*0.2,y,0.0));
 
 
 
-        let projection = geom::Transform3::perspective(45.0, 0.0, 15.0, canvas.viewport().aspect());
-        self.program.uniform("worldTransform").set(projection);
+        let projection = geom::Transform3::perspective(45.0, 0.0, 100.0, canvas.viewport().aspect());
+        let transform = camera_transform * projection;
+        self.program.uniform("worldTransform").set(transform);
 
         self.chunk.render(self, canvas);
     }
