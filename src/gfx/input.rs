@@ -35,7 +35,7 @@ impl State
     pub fn process(&mut self, event: &Event) {
         match *event {
             Event::Mouse(e) => self.mouse.process(e),
-            Event::Keyboard(e) => unimplemented!(),
+            Event::Keyboard(e) => self.keyboard.process(e),
         }
     }
 }
@@ -51,7 +51,7 @@ pub mod keyboard
 {
     use super::Action;
     use std::{self,fmt};
-    use std::collections::LinkedList;
+    use std::collections::HashSet;
 
     /// A keyboard event.
     #[derive(Copy,Clone,Debug,Eq,PartialEq)]
@@ -64,25 +64,47 @@ pub mod keyboard
     #[derive(Clone,Default,Debug,PartialEq,Eq)]
     pub struct State
     {
-        pressed: LinkedList<Key>,
+        pressed: HashSet<Key>,
     }
 
     impl State
     {
         /// Checks if a key is pressed.
         pub fn pressed(&self, key: Key) -> bool {
-            self.pressed.iter().any(|&a| a==key)
+            self.pressed.contains(&key)
         }
 
         /// Gets an iterator over the pressed keys.
         pub fn pressed_keys<'a>(&'a self)
-            -> std::collections::linked_list::Iter<'a, Key> {
+            -> std::collections::hash_set::Iter<'a, Key> {
             self.pressed.iter()
+        }
+
+        /// Processes an event and updates the state accordingly.
+        pub fn process(&mut self, event: Event) {
+            match event {
+                Event::Key(key, action) => {
+                    match action {
+                        Action::Press => {
+                            debug_assert!(!self.pressed.contains(&key),
+                                          "key should not be already pressed");
+
+                            self.pressed.insert(key);
+                        },
+                        Action::Release => {
+                            debug_assert!(self.pressed.contains(&key),
+                                          "key should already be pressed");
+
+                            self.pressed.remove(&key);
+                        }
+                    }
+                }
+            }
         }
     }
 
     /// The source of a number-related key.
-    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq,Hash)]
     pub enum NumberSource
     {
         /// The horizontal number row.
@@ -92,14 +114,14 @@ pub mod keyboard
     }
 
     /// The side of the keyboard that was pressed.
-    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq,Hash)]
     pub enum Side
     {
         Left,
         Right,
     }
 
-    #[derive(Copy,Clone,Debug,PartialEq,Eq)]
+    #[derive(Copy,Clone,Debug,PartialEq,Eq,Hash)]
     pub enum Key
     {
         Space,
