@@ -17,7 +17,8 @@ const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 
 const BLOCK_SIZE: f32 = 0.005;
-const MOVE_STEP: f32 = 0.2;
+// number of units to move in a second
+const MOVE_SPEED: f32 = 1.4;
 
 #[repr(packed)]
 pub struct Vertex {
@@ -57,6 +58,7 @@ pub struct Context
     chunk: Chunk,
 
     camera_pos: math::Vector3,
+    timer: util::Timer,
 }
 
 pub struct Chunk
@@ -175,6 +177,7 @@ impl Context
             clock: 0.0,
             chunk: chunk,
             camera_pos: math::Vector3(0.,0.,0.),
+            timer: util::Timer::new(),
         }
     }
 
@@ -187,6 +190,8 @@ impl Context
         for event in self.device.events() {
             self.handle_event(event)
         }
+        let delta = self.timer.mark();
+        self.step(delta);
 
         let mut canvas = self.device.begin();
         self.render(&mut canvas);
@@ -195,32 +200,30 @@ impl Context
 
         self.clock += 0.05;
     }
+    
+    fn step(&mut self, delta: f64) {
+        use gfx::input::Key;
+
+        println!("step: {}s", delta);
+
+        let keyboard = self.device.inputs().keyboard();
+
+        let displacement = (MOVE_SPEED as f64 * delta) as f32;
+
+        if keyboard.pressed(Key::Up) {
+            self.camera_pos = self.camera_pos + math::Vector3(0.,displacement,0.);
+        } if keyboard.pressed(Key::Down) {
+            self.camera_pos = self.camera_pos - math::Vector3(0.,displacement,0.);
+        } if keyboard.pressed(Key::Left) {
+            self.camera_pos = self.camera_pos - math::Vector3(displacement,0.,0.);
+        } if keyboard.pressed(Key::Right) {
+            self.camera_pos = self.camera_pos + math::Vector3(displacement,0.,0.);
+        }
+    }
 
     fn handle_event(&mut self, event: gfx::input::Event) {
-        use gfx::input::{Key,Action};
 
         match event {
-            gfx::input::Event::Keyboard(e) => {
-                match e {
-                    gfx::input::keyboard::Event::Key(key,action) => {
-                        match (key,action) {
-                            (Key::Up,Action::Press) => {
-                                self.camera_pos = self.camera_pos + math::Vector3(0.,MOVE_STEP,0.);
-                            },
-                            (Key::Down,Action::Press) => {
-                                self.camera_pos = self.camera_pos - math::Vector3(0.,MOVE_STEP,0.);
-                            },
-                            (Key::Left,Action::Press) => {
-                                self.camera_pos = self.camera_pos - math::Vector3(MOVE_STEP,0.,0.);
-                            },
-                            (Key::Right,Action::Press) => {
-                                self.camera_pos = self.camera_pos + math::Vector3(MOVE_STEP,0.,0.);
-                            },
-                            _ => (),
-                        }
-                    }
-                }
-            },
             gfx::input::Event::Mouse((kind,info)) => {
                 match kind {
                     gfx::input::mouse::Kind::Button(button, action) => {
@@ -239,6 +242,7 @@ impl Context
                     },
                 }
             },
+            _ => (),
         }
     }
 

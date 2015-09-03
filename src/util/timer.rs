@@ -37,6 +37,7 @@ impl Timer
         let delta_ns = (current_time - self.last_marked) as f64;
         
         self.delta = delta_ns/1000000000.0;
+        self.last_marked = current_time;
         
         self.delta
     }
