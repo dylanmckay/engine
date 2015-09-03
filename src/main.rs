@@ -16,7 +16,7 @@ const MODEL_DATA: &'static str = include_str!("../res/unit_cube.obj");
 const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
 const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 
-const BLOCK_SIZE: f32 = 0.005;
+const BLOCK_SIZE: f32 = 0.5;
 // number of units to move in a second
 const MOVE_SPEED: f32 = 1.4;
 
@@ -106,10 +106,12 @@ impl Chunk
                             let y = yi as f32 * BLOCK_SIZE;
                             let z = zi as f32 * BLOCK_SIZE;
                             let transform = geom::Transform3::identity()
+                                           .scale(math::Vector3(BLOCK_SIZE,BLOCK_SIZE,BLOCK_SIZE))
                                            .translate(math::Vector3(x,y,z));
 
                             context.program.uniform("modelTransform").set(transform);
 
+                            println!("drawing: {:?}", (x,y,z));
                             canvas.draw_mesh(&context.mesh, &context.program);
                         },
                         Block::Empty => { },
@@ -117,6 +119,7 @@ impl Chunk
                 }
             }
         }
+        context.program.uniform("modelTransform").set(geom::Transform3::identity());
     }
 }
 
@@ -163,7 +166,7 @@ impl Context
         program.uniform("lightPosition").set(light_pos);
 
         let chunk = Chunk::from_fn(|x,y,z| {
-            if x%2 == 0 {
+            if (x+z)%2 == 0 {
                 Block::Square( (1.0/x as f32, 1.0/y as f32, 1.0/z as f32) )
             } else {
                 Block::Empty
@@ -203,8 +206,6 @@ impl Context
     
     fn step(&mut self, delta: f64) {
         use gfx::input::Key;
-
-        println!("step: {}s", delta);
 
         let keyboard = self.device.inputs().keyboard();
 
