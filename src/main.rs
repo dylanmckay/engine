@@ -216,6 +216,21 @@ impl Context
                     _ => (),
                 }
             },
+            gfx::input::Event::Mouse((kind,info)) => {
+                match kind {
+                    gfx::input::mouse::Kind::Button(button, action) => {
+                        match (button,action) {
+                            (gfx::input::mouse::Button::Left, gfx::input::Action::Press) => {
+
+                                println!("left!");
+                            },
+                            _ => {
+
+                            },
+                        }
+                    }
+                }
+            },
         }
     }
 

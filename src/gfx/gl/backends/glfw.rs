@@ -31,6 +31,8 @@ impl Backend
         gfx::gl::gl::load_with(|s| window.get_proc_address(s));
 
         window.set_key_polling(true);
+        window.set_mouse_button_polling(true);
+
         window.make_current();
 
         Backend {
@@ -47,7 +49,7 @@ impl gfx::gl::Backend for Backend
         self.glfw.poll_events();
 
         for (_,event) in glfw::flush_messages(&self.events) {
-            match self::util::into_event(event) {
+            match self::util::into_event(event, &self.window) {
                 Some(e) => {
                     events.push_back(e);
                 },
@@ -81,7 +83,10 @@ pub mod util
     use super::glfw;
     use gfx::input::{self,Event};
 
-    pub fn into_event(event: glfw::WindowEvent) -> Option<Event> {
+    pub fn into_event(event: glfw::WindowEvent,
+                      window: &glfw::Window)
+        -> Option<Event> {
+
         match event {
             glfw::WindowEvent::Key(gkey, _, gaction, _) => {
                 let action = match into_action(gaction) {
@@ -95,6 +100,23 @@ pub mod util
                 };
 
                 Some(Event::Key(key, action))
+
+            },
+            glfw::WindowEvent::MouseButton(gbutton, gaction, _) => {
+                let button = match into_mouse_button(gbutton) {
+                    Some(b) => b,
+                    None => { return None; },
+                };
+
+                let action = match into_action(gaction) {
+                    Some(a) => a,
+                    None => { return None; },
+                };
+
+                let kind = input::mouse::Kind::Button(button,action);
+                let mouse_event = create_mouse_event(kind, &window);
+
+                Some(input::Event::Mouse(mouse_event))
 
             },
             _ => unimplemented!(),
@@ -111,7 +133,7 @@ pub mod util
 
     // TODO: implement all keys
     pub fn into_key(key: glfw::Key) -> Option<input::Key> {
-        use gfx::input::Key;
+        use gfx::input::{Key,Side};
 
         match key {
             glfw::Key::Space => Some(Key::Space),
@@ -221,7 +243,48 @@ pub mod util
             glfw::Key::Kp8 => Some(Key::Num(8, input::NumberSource::Pad)),
             glfw::Key::Kp9 => Some(Key::Num(9, input::NumberSource::Pad)),
 
-            _ => unimplemented!(),
+            glfw::Key::KpDecimal => Some(Key::Decimal),
+            glfw::Key::KpDivide => Some(Key::Divide),
+            glfw::Key::KpMultiply => Some(Key::Multiply),
+            glfw::Key::KpSubtract => Some(Key::Subtract),
+            glfw::Key::KpAdd => Some(Key::Add),
+            glfw::Key::KpEnter => Some(Key::Enter),
+            glfw::Key::KpEqual => Some(Key::Equal),
+            glfw::Key::LeftShift => Some(Key::Shift(Side::Left)),
+            glfw::Key::LeftControl => Some(Key::Control(Side::Left)),
+            glfw::Key::LeftAlt => Some(Key::Control(Side::Left)),
+            glfw::Key::LeftSuper => Some(Key::Super(Side::Left)),
+            glfw::Key::RightShift => Some(Key::Shift(Side::Right)),
+            glfw::Key::RightControl => Some(Key::Control(Side::Right)),
+            glfw::Key::RightAlt => Some(Key::Alt(Side::Right)),
+            glfw::Key::RightSuper => Some(Key::Super(Side::Right)),
+            glfw::Key::Menu => Some(Key::Menu),
         }
+    }
+
+    pub fn into_mouse_button(button: glfw::MouseButton) -> Option<input::mouse::Button> {
+        match button {
+            glfw::MouseButton::Button1 => Some(input::mouse::Button::Left),
+            glfw::MouseButton::Button2 => Some(input::mouse::Button::Right),
+            glfw::MouseButton::Button3 => Some(input::mouse::Button::Middle),
+            glfw::MouseButton::Button4 => None,
+            glfw::MouseButton::Button5 => None,
+            glfw::MouseButton::Button6 => None,
+            glfw::MouseButton::Button7 => None,
+            glfw::MouseButton::Button8 => None,
+        }
+    }
+
+    pub fn create_mouse_event(kind: input::mouse::Kind,
+                              window: &glfw::Window)
+        -> input::mouse::Event {
+        // get cursor pos as relatie position
+        let (x,y) = window.get_cursor_pos();
+
+        let info = input::mouse::Info {
+            pos: (x as f32, y as f32),
+        };
+
+        (kind, info)
     }
 }

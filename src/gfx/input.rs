@@ -6,6 +6,8 @@ pub use self::keyboard::{NumberSource,Side,Key};
 pub enum Event
 {
     Key(Key, Action),
+    /// A mouse event.
+    Mouse(mouse::Event),
 }
 
 #[derive(Copy,Clone,Debug)]
@@ -58,6 +60,12 @@ pub mod keyboard
         Q, R, S, T, U, V, W, X, Y, Z,
 
         LeftBracket, RightBracket,
+
+        Decimal,
+        Divide,
+        Multiply,
+        Subtract,
+        Add,
 
         Escape,
         Enter,
@@ -131,6 +139,12 @@ pub mod keyboard
 
                 Key::LeftBracket => '('.fmt(fmt),
                 Key::RightBracket => ')'.fmt(fmt),
+                Key::Decimal => '.'.fmt(fmt),
+                Key::Divide => '/'.fmt(fmt),
+                Key::Multiply => '*'.fmt(fmt),
+                Key::Subtract => '-'.fmt(fmt),
+                Key::Add => '+'.fmt(fmt),
+
                 Key::Escape => "Esc".fmt(fmt),
                 Key::Enter => "Enter".fmt(fmt),
                 Key::Tab => "Tab".fmt(fmt),
@@ -162,5 +176,34 @@ pub mod keyboard
                 Key::Menu => "Menu".fmt(fmt),
             }
         }
+    }
+}
+
+pub mod mouse
+{
+    use super::Action;
+
+    /// A mouse event.
+    #[derive(Copy,Clone,Debug)]
+    pub enum Kind
+    {
+        /// A button was pressed or released.
+        Button(Button, Action),
+    }
+
+    pub type Event = (Kind,Info);
+
+    /// Information about a mouse event.
+    #[derive(Copy,Clone,Debug)]
+    pub struct Info {
+        pub pos: (f32,f32),
+    }
+
+    /// Specifies a mouse button.
+    #[derive(Copy,Clone,Debug)]
+    pub enum Button {
+        Left,
+        Middle,
+        Right,
     }
 }
