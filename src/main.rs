@@ -9,6 +9,7 @@ pub mod math;
 pub mod color;
 pub mod geom;
 pub mod gfx;
+pub mod util;
 
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
 const MODEL_DATA: &'static str = include_str!("../res/unit_cube.obj");
