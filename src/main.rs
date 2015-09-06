@@ -111,7 +111,6 @@ impl Chunk
 
                             context.program.uniform("modelTransform").set(transform);
 
-                            println!("drawing: {:?}", (x,y,z));
                             canvas.draw_mesh(&context.mesh, &context.program);
                         },
                         Block::Empty => { },
@@ -207,7 +206,7 @@ impl Context
     fn step(&mut self, delta: f64) {
         use gfx::input::Key;
 
-        let keyboard = self.device.inputs().keyboard();
+        let keyboard = self.device.input_state().keyboard();
 
         let displacement = (MOVE_SPEED as f64 * delta) as f32;
 
@@ -239,7 +238,6 @@ impl Context
                         }
                     },
                     gfx::input::mouse::Kind::Move => {
-                        println!("Position: {:?}", info.position());
                     },
                 }
             },

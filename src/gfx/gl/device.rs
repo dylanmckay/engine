@@ -131,7 +131,7 @@ impl<B: gl::Backend> Device<B>
     }
 
     /// Gets the current input state.
-    pub fn inputs<'a>(&'a self) -> &'a input::State {
+    pub fn input_state<'a>(&'a self) -> &'a input::State {
         &self.input_state
     }
 }
