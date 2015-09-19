@@ -15,4 +15,7 @@ pub trait Backend
     fn dimensions(&self) -> (u32,u32);
     /// Sets the title of the window (if possible).
     fn set_title(&mut self, title: &str);
+    
+    fn set_mouse_pos(&mut self, pos: (u32,u32));
+    fn set_cursor_visible(&mut self, visible: bool);
 }

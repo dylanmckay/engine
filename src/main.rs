@@ -19,6 +19,7 @@ const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
 const BLOCK_SIZE: f32 = 0.5;
 // number of units to move in a second
 const MOVE_SPEED: f32 = 1.4;
+const ROTATE_SPEED: f32 = 0.2;
 
 #[repr(packed)]
 pub struct Vertex {
@@ -58,6 +59,7 @@ pub struct Context
     chunk: Chunk,
 
     camera_pos: math::Vector3,
+    rot: math::Vector3,
     timer: util::Timer,
 }
 
@@ -158,6 +160,7 @@ impl Context
 
         device.set_title("Engine Test");
         device.set_culling_mode(gfx::CullingMode::Back);
+        device.set_cursor_visible(false);
 
         let mesh = device.load_mesh_data(&mesh_data);
 
@@ -179,6 +182,7 @@ impl Context
             clock: 0.0,
             chunk: chunk,
             camera_pos: math::Vector3(0.,0.,0.),
+            rot: math::Vector3(0.,0.,0.),
             timer: util::Timer::new(),
         }
     }
@@ -199,6 +203,7 @@ impl Context
         self.render(&mut canvas);
 
         self.device.end();
+        self.device.set_mouse_pos((0.0,0.0));
 
         self.clock += 0.05;
     }
@@ -207,6 +212,7 @@ impl Context
         use gfx::input::Key;
 
         let keyboard = self.device.input_state().keyboard();
+        let mouse = self.device.input_state().mouse();
 
         let displacement = (MOVE_SPEED as f64 * delta) as f32;
 
@@ -218,7 +224,15 @@ impl Context
             self.camera_pos = self.camera_pos - math::Vector3(displacement,0.,0.);
         } if keyboard.pressed(Key::Right) {
             self.camera_pos = self.camera_pos + math::Vector3(displacement,0.,0.);
+        } if keyboard.pressed(Key::Space) {
+            self.camera_pos = self.camera_pos + math::Vector3(0.,0.,displacement);
         }
+
+        let mouse_delta = mouse.position();
+        self.rot = self.rot + math::Vector3(mouse_delta.1*ROTATE_SPEED,
+                                            mouse_delta.0*ROTATE_SPEED,
+                                            0.0);
+
     }
 
     fn handle_event(&mut self, event: gfx::input::Event) {
@@ -255,13 +269,13 @@ impl Context
 
         let camera_transform = geom::Transform3::identity()
                                .scale(math::Vector3(0.5,0.5,0.5))
-                               .translate(self.camera_pos);
-         //               .rotate(math::Vector3(y*0.2,y,0.0));
+                               .translate(self.camera_pos)
+                               .rotate(self.rot);
 
 
 
-        let projection = geom::Transform3::perspective(45.0, 0.0, 100.0, canvas.viewport().aspect());
-        let transform = camera_transform * projection;
+        let projection = geom::Transform3::perspective(45.0, 0., 1000.0, canvas.viewport().aspect());
+        let transform = projection*camera_transform;
         self.program.uniform("worldTransform").set(transform);
 
         self.chunk.render(self, canvas);

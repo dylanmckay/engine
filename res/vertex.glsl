@@ -12,7 +12,7 @@ smooth out vec3 interpColor;
 
 void main()
 {
-    gl_Position = modelTransform*worldTransform*position;
+    gl_Position = (modelTransform*worldTransform)*position;
     vec3 normalisedNormal = normalize(normal);
     vec3 lightDir = vec3(gl_Position.x,gl_Position.y,gl_Position.z) - lightPosition;
 

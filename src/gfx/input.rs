@@ -22,13 +22,21 @@ pub struct State
 impl State
 {
     /// Gets the state of the keyboard.
-    pub fn keyboard<'a>(&'a self) -> &'a keyboard::State {
+    pub fn keyboard(&self) -> &keyboard::State {
         &self.keyboard
     }
 
+    pub fn keyboard_mut(&mut self) -> &mut keyboard::State {
+        &mut self.keyboard
+    }
+
     /// Gets the state of the mouse.
-    pub fn mouse<'a>(&'a self) -> &'a mouse::State {
+    pub fn mouse(&self) -> &mouse::State {
         &self.mouse
+    }
+
+    pub fn mouse_mut(&mut self) -> &mut mouse::State {
+        &mut self.mouse
     }
 
     /// Processes an event and updates the state accordingly.
@@ -312,6 +320,12 @@ pub mod mouse
                 },
             }
 
+        }
+
+        /// Sets the stored position of the mouse.
+        /// **Note**: This does not actually change the actual mouse position.
+        pub fn set_position(&mut self, pos: (f32,f32)) {
+            self.position = pos;
         }
     }
 

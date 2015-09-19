@@ -130,6 +130,17 @@ impl<B: gl::Backend> Device<B>
         }
     }
 
+    pub fn set_mouse_pos(&mut self, pos: (f32,f32)) {
+        let pixel_pos = self.map_point_to_pixel(pos);
+        self.backend.set_mouse_pos(pixel_pos);
+
+        self.input_state.mouse_mut().set_position(pos);
+    }
+
+    pub fn set_cursor_visible(&mut self, visible: bool) {
+        self.backend.set_cursor_visible(visible);
+    }
+
     /// Gets the current input state.
     pub fn input_state<'a>(&'a self) -> &'a input::State {
         &self.input_state

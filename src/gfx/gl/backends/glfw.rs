@@ -76,6 +76,20 @@ impl gfx::gl::Backend for Backend
     fn set_title(&mut self, title: &str) {
         self.window.set_title(title)
     }
+
+    fn set_mouse_pos(&mut self, (x,y): (u32,u32)) {
+        self.window.set_cursor_pos(x as f64, y as f64)
+    }
+
+    fn set_cursor_visible(&mut self, visible: bool) {
+        let mode = if visible {
+            glfw::CursorMode::Normal
+        } else {
+            glfw::CursorMode::Hidden
+        };
+
+        self.window.set_cursor_mode(mode);
+    }
 }
 
 /// Useful utilities.
