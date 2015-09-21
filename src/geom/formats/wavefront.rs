@@ -17,10 +17,12 @@ pub struct Vertex
 
 pub type Face = Vec<(i32,i32,i32)>;
 
-impl geom::Vertex<Scalar> for Vertex
+impl geom::Vertex for Vertex
 {
-    fn coords(self) -> (Scalar,Scalar,Scalar) {
-        self.position.into()
+    type T = Scalar;
+
+    fn coords(self) -> Vector3<Scalar> {
+        self.position
     }
 }
 

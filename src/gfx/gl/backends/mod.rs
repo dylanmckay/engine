@@ -1,7 +1,12 @@
 
+pub use self::glfw::Backend as Glfw;
 pub mod glfw;
 
 use gfx::input::Event;
+
+pub fn default() -> Glfw {
+    Glfw::new()
+}
 
 /// The default window title.
 const DEFAULT_TITLE: &'static str = "Engine";

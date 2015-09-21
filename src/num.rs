@@ -424,4 +424,21 @@ pub fn min<T: Bounded>() -> T
     Bounded::min()
 }
 
+pub fn average<T, I>(values: I) -> T
+    where T: Add<Output=T> + Div<Output=T> + Zero + One + Clone,
+          I: Iterator<Item=T> {
 
+    let mut count = T::zero();
+    let mut avg = T::zero();
+
+    for value in values {
+        avg = avg + value;
+        count = count + T::one();
+    }
+
+    if !count.clone().is_zero() {
+        avg = avg / count;
+    }
+
+    avg
+}

@@ -9,6 +9,11 @@ pub struct Vector3<T: Num = Scalar>(pub T,pub T,pub T);
 
 impl<T: Num> Vector3<T>
 {
+    /// Creates a vector with identical components.
+    pub fn with_components(val: T) -> Self {
+        Vector3(val, val, val)
+    }
+
     /// Maps from one vector to another.
     pub fn map<U, F>(self, f: F) -> Vector3<U>
         where U: Num, F: Fn(T) -> U {
@@ -49,8 +54,7 @@ impl<T: Num> Vector3<T>
     }
 
     /// Takes the absolute value of all of the components.
-    pub fn as_positive(self) -> Self
-        where T: num::Signed {
+    pub fn as_positive(self) -> Self {
         self.map(|c| c.abs())
     }
 
@@ -71,6 +75,25 @@ impl<T: Num> std::iter::FromIterator<T> for Vector3<T>
         let z = it.next().unwrap();
 
         Vector3(x,y,z)
+    }
+}
+
+impl<T: Num> num::Zero for Vector3<T>
+{
+    fn zero() -> Self {
+        Vector3(T::zero(), T::zero(), T::zero())
+    }
+
+    fn is_zero(self) -> bool {
+        let (x,y,z) = self.into();
+        x.is_zero() && y.is_zero() && z.is_zero()
+    }
+}
+
+impl<T: Num> num::One for Vector3<T>
+{
+    fn one() -> Self {
+        Vector3::with_components(T::one())
     }
 }
 
@@ -133,6 +156,28 @@ impl<T: Num> ops::Mul<T> for Vector3<T>
     fn mul(self, rhs: T) -> Vector3<T> {
         let Vector3(x,y,z) = self;
         Vector3(x*rhs, y*rhs, z*rhs)
+    }
+}
+
+impl<T: Num> ops::Div for Vector3<T>
+{
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self {
+        let (x1,y1,z1) = self.into();
+        let (x2,y2,z2) = rhs.into();
+
+        Vector3(x1/x2, y1/y2, z1/z2)
+    }
+}
+
+impl<T: Num> ops::Div<T> for Vector3<T>
+{
+    type Output = Vector3<T>;
+
+    fn div(self, rhs: T) -> Vector3<T> {
+        let Vector3(x,y,z) = self;
+        Vector3(x/rhs, y/rhs, z/rhs)
     }
 }
 
