@@ -92,6 +92,13 @@ pub trait Decimal : Num
 /// A number which can be positive or negative.
 pub trait Signed: Neg<Output=Self> + Sized
 {
+    // moved into seperate trait, to work around the
+    // difficulties of trait bounds
+    //fn abs(self) -> Self;
+}
+
+pub trait Abs
+{
     fn abs(self) -> Self;
 }
 
@@ -103,7 +110,7 @@ pub trait Num : Copy + Clone + Zero + One + Bounded +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
                 Rem<Output=Self> + PartialEq + NumCast +
-                PartialOrd
+                PartialOrd + Abs
 {
 
 }
@@ -237,10 +244,12 @@ macro_rules! impl_decimal {
 /// Implements the `Signed` trait on a type.
 macro_rules! impl_signed {
     ($ty:ident, $t:ident) => {
-        impl Signed for $ty
+        impl Signed for $ty { }
+
+        impl Abs for $ty
         {
-            fn abs(self) -> $ty
-            {
+            fn abs(self) -> $ty {
+
                 $ty::abs(self)
             }
         }
@@ -251,6 +260,13 @@ macro_rules! impl_signed {
 macro_rules! impl_unsigned {
     ($ty:ident) => {
         impl Unsigned for $ty { }
+
+        impl Abs for $ty
+        {
+            fn abs(self) -> $ty {
+                self
+            }
+        }
     }
 }
 
@@ -258,7 +274,7 @@ macro_rules! impl_unsigned {
 macro_rules! impl_num {
     ($ty:ident) => {
     
-        impl Num       for $ty { }
+        impl Num for $ty { }
     }
 }
 
