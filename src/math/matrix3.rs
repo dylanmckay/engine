@@ -89,6 +89,21 @@ impl<T: Num> std::ops::Mul for Matrix3<T>
     }
 }
 
+impl<T: Num> std::ops::Mul<Matrix3<T>> for math::Vector3<T>
+{
+    type Output = math::Vector3<T>;
+
+    fn mul(self, m: Matrix3<T>) -> math::Vector3<T> {
+        let (x,y,z) = self.into();
+
+        let xdash = x*m[(0,0)] + y*m[(1,0)] + z*m[(2,0)];
+        let ydash = x*m[(0,1)] + y*m[(1,1)] + z*m[(2,1)];
+        let zdash = x*m[(0,2)] + y*m[(1,2)] + z*m[(2,2)];
+
+        math::Vector3(xdash, ydash, zdash)
+    }
+}
+
 impl<T: Num> std::ops::Index<(usize,usize)> for Matrix3<T>
 {
     type Output = T;
