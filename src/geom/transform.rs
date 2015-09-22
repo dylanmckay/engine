@@ -10,6 +10,8 @@ pub type Rotation3<T> = Matrix3<T>;
 
 impl<T: Num> Transform3<T>
 {
+    /// Creates a perspective transformation.
+    /// `fov` - the field of view in radians.
     pub fn perspective(fov: T, near: T, far: T, aspect: T) -> Self
         where T: Decimal + num::Signed {
 
