@@ -109,10 +109,19 @@ impl<T: Num> std::ops::Mul<Matrix4<T>> for math::Vector3<T>
 
     fn mul(self, m: Matrix4<T>) -> math::Vector3<T> {
         let (x,y,z) = self.into();
+        let w = T::one();
 
-        let xdash = x*m[(0,0)] + y*m[(1,0)] + z*m[(2,0)];
-        let ydash = x*m[(0,1)] + y*m[(1,1)] + z*m[(2,1)];
-        let zdash = x*m[(0,2)] + y*m[(1,2)] + z*m[(2,2)];
+        let mut xdash = x*m[(0,0)] + y*m[(1,0)] + z*m[(2,0)] + w*m[(3,0)];
+        let mut ydash = x*m[(0,1)] + y*m[(1,1)] + z*m[(2,1)] + w*m[(3,1)];
+        let mut zdash = x*m[(0,2)] + y*m[(1,2)] + z*m[(2,2)] + w*m[(3,2)];
+        let wdash = x*m[(0,3)] + y*m[(1,3)] + z*m[(2,3)] + w*m[(3,3)];
+
+        // Normalise homogenous coordinates
+        if !wdash.is_zero() {
+            xdash = xdash / wdash;
+            ydash = ydash / wdash;
+            zdash = zdash / wdash;
+        }
 
         math::Vector3(xdash, ydash, zdash)
     }
@@ -147,3 +156,28 @@ impl<T: Num> Into<((T,T,T,T),(T,T,T,T),(T,T,T,T),(T,T,T,T))> for Matrix4<T>
 fn calculate_index(row: usize, col: usize) -> usize {
     row*4 + col
 }
+
+#[test]
+fn test_mat4_mul() {
+    let identity = Matrix4::identity();
+    let mat1 = Matrix4::new(1.,2.,3.,4.,
+                            1.,2.,3.,4.,
+                            1.,2.,3.,4.,
+                            1.,2.,3.,4.);
+    let mat2 = Matrix4::new(9.,8.,7.,6.,
+                            9.,8.,7.,6.,
+                            9.,8.,7.,6.,
+                            9.,8.,7.,6.);
+
+    assert_eq!(mat1 * identity, mat1);
+    assert_eq!(mat2 * identity, mat2);
+    assert_eq!(mat2 * identity, identity * mat2);
+
+    assert_eq!(mat1 * mat2, Matrix4::new(
+        90., 80., 70., 60.,
+        90., 80., 70., 60.,
+        90., 80., 70., 60.,
+        90., 80., 70., 60.,
+    ));
+}
+

@@ -34,6 +34,13 @@ impl<T: Num> Vector2<T>
         val
     }
 
+    pub fn dot(self, other: Self) -> T {
+        let (x1,y1) = self.into();
+        let (x2,y2) = other.into();
+
+        x1*x2 + y1*y2
+    }
+
     /// Casts the components to a different type.
     // TODO: Use higher-kinded types to move this into
     //       the Vector trait when possible.

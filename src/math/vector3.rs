@@ -41,6 +41,24 @@ impl<T: Num> Vector3<T>
         val
     }
 
+    pub fn dot(self, other: Self) -> T {
+        let (x1,y1,z1) = self.into();
+        let (x2,y2,z2) = other.into();
+
+        x1*x2 + y1*y2 + z1*z2
+    }
+
+    pub fn cross(self, other: Self) -> Self {
+        let (x1,y1,z1) = self.into();
+        let (x2,y2,z2) = other.into();
+
+        let x = y1 * z2 - z1 * y2;
+        let y = z1 * x2 - x1 * z2;
+        let z = x1 * y2 - y1 * x2;
+
+        Vector3(x,y,z)
+    }
+
     /// Casts the components to a different type.
     // TODO: Use higher-kinded types to move this into
     //       the Vector trait when possible.
