@@ -4,7 +4,7 @@ use num::Num;
 
 /// A matrix.
 /// Note that matrices are stored in row-major form.
-pub trait Matrix<T: Num> : Sized
+pub trait Matrix<T: Num> : Sized + Copy + Clone
 {
     /// Gets the identity matrix.
     // TODO: Make this an associated constant.

@@ -3,6 +3,7 @@ use math::{self,Matrix};
 use num::Num;
 use std;
 
+#[derive(Copy,Clone,Debug,Eq,PartialEq)]
 pub struct Matrix4<T: Num>
 {
     m: [T; 16],
