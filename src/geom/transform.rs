@@ -1,9 +1,9 @@
 
-use math::{self,Vector3,Matrix,Matrix3,Matrix4};
+use math::{self,Scalar,Vector3,Matrix,Matrix3,Matrix4};
 use num::{self,Num,Decimal};
 
 /// A 3D transformation.
-pub type Transform3<T> = Matrix4<T>;
+pub type Transform3<T = Scalar> = Matrix4<T>;
 
 /// A 3D rotation matrix.
 pub type Rotation3<T> = Matrix3<T>;
