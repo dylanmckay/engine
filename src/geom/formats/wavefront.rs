@@ -52,7 +52,7 @@ impl<I,V> Format<I,V> for Wavefront
     where I: num::Integer,
           V: From<Vertex>
 {
-    fn load_with_builder<R>(read: R, builder: &mut mesh::Builder<I,V>)
+    fn load_with_builder<R>(read: R, builder: &mut mesh::StaticBuilder<I,V>)
         where R: io::Read {
         use std::io::BufRead;
 

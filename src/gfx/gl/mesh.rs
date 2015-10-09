@@ -224,7 +224,7 @@ impl Data
         }
     }
 
-    pub fn load<I,V>(mut self, data: &geom::mesh::Data<I,V>, usage: GLenum) -> Self
+    pub fn load<I,V>(mut self, data: &geom::mesh::StaticData<I,V>, usage: GLenum) -> Self
         where I: Type, V: vertex::Vertex {
         self.buffers.extend(data.buffers()
                                 .map(|b| Buffer::load(b, usage)));

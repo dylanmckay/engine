@@ -90,7 +90,7 @@ impl<B: gl::Backend> Device<B>
     }
 
     /// Loads mesh data.
-    pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::Data<I,V>)
+    pub fn load_mesh_data<I,V>(&mut self, data: &geom::mesh::StaticData<I,V>)
         -> gl::mesh::Data
         where I: gl::Type, V: gl::Vertex {
         gl::mesh::Data::new().load(data, libgl::STATIC_DRAW)

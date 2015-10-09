@@ -32,21 +32,21 @@ impl<I,V> Default for Buffer<I,V>
 }
 
 /// A set of mesh buffers.
-pub struct Data<I,V>
+pub struct StaticData<I,V>
 {
     pub data: Vec<Buffer<I,V>>,
 }
 
-impl<I,V> Data<I,V>
+impl<I,V> StaticData<I,V>
 {
     pub fn new(data: Vec<Buffer<I,V>>) -> Self {
-        Data {
+        StaticData {
             data: data,
         }
     }
 
     pub fn empty() -> Self {
-        Data::new(Vec::new())
+        StaticData::new(Vec::new())
     }
 
     pub fn buffers<'a>(&'a self) -> std::slice::Iter<'a, Buffer<I,V>> {
@@ -54,7 +54,7 @@ impl<I,V> Data<I,V>
     }
 }
 
-impl<I,V> Default for Data<I,V>
+impl<I,V> Default for StaticData<I,V>
 {
     fn default() -> Self {
         Self::empty()
@@ -67,7 +67,7 @@ impl<I,V> Default for Data<I,V>
 /// for the split it buffers when a mesh is built.
 ///
 /// TODO: split meshes up into multiple buffers.
-pub struct Builder<I, V>
+pub struct StaticBuilder<I, V>
 {
     #[allow(dead_code)]
     buffer_size: usize,
@@ -75,11 +75,11 @@ pub struct Builder<I, V>
     vertices: Vec<V>,
 }
 
-impl<I,V> Builder<I,V>
+impl<I,V> StaticBuilder<I,V>
 {
     pub fn new() -> Self {
 
-        Builder {
+        StaticBuilder {
             buffer_size: DEFAULT_BUFFER_SIZE,
             indices: Vec::new(),
             vertices: Vec::new(),
@@ -99,11 +99,11 @@ impl<I,V> Builder<I,V>
     }
 }
 
-impl<I,V> Into<Data<I,V>> for Builder<I,V>
+impl<I,V> Into<StaticData<I,V>> for StaticBuilder<I,V>
 {
-    fn into(self) -> Data<I,V> {
+    fn into(self) -> StaticData<I,V> {
         let buffer = Buffer::new(self.indices, self.vertices);
-        let data = Data::new(vec![buffer]);
+        let data = StaticData::new(vec![buffer]);
 
         data
         
