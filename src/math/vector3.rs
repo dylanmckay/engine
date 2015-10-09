@@ -59,6 +59,27 @@ impl<T: Num> Vector3<T>
         Vector3(x,y,z)
     }
 
+    pub fn xyz(self) -> (T,T,T) { self.into() }
+    pub fn xy(self) -> (T,T) {
+        let Vector3(x,y,_) = self;
+        (x,y)
+    }
+
+    pub fn x(self) -> T {
+        let Vector3(x,_,_) = self;
+        x
+    }
+
+    pub fn y(self) -> T {
+        let Vector3(_,y,_) = self;
+        y
+    }
+
+    pub fn z(self) -> T {
+        let Vector3(_,_,z) = self;
+        z
+    }
+
     /// Casts the components to a different type.
     // TODO: Use higher-kinded types to move this into
     //       the Vector trait when possible.

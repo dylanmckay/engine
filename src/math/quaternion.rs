@@ -6,10 +6,14 @@ use std;
 /// A quaternion.
 /// The quaternion is of the form `(x,y,z,w)`.
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
-pub struct Quaternion<T: Decimal>(pub T, pub T, pub T, pub T);
+pub struct Quaternion<T: Decimal = math::Scalar>(pub T, pub T, pub T, pub T);
 
 impl<T: Decimal> Quaternion<T>
 {
+    pub fn identity() -> Self {
+        Quaternion(T::zero(), T::zero(), T::zero(), T::one())
+    }
+
     pub fn from_euler_radians(euler: math::Vector3<T>) -> Self {
         let half_euler = euler * (T::one()/(T::one()+T::one()));
         let (ex,ey,ez) = half_euler.into();
