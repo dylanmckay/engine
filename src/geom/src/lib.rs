@@ -1,4 +1,9 @@
 
+extern crate num;
+extern crate math;
+
+extern crate byteorder;
+
 pub use self::formats::Format;
 pub use self::triangle::Triangle;
 pub use self::aabb::Aabb;
@@ -13,10 +18,6 @@ pub mod transform;
 
 pub mod formats;
 pub mod util;
-
-use num;
-use math;
-use std;
 
 pub trait Vertex : Copy + Clone
 {

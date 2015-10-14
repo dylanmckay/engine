@@ -16,7 +16,10 @@ path = "src/num"
 [dependencies.math]
 path = "src/math"
 
+[dependencies.geom]
+path = "src/geom"
+
 [dependencies]
 libc = "*"
 time = "*"
-byteorder = "0.3"
+

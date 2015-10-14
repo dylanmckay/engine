@@ -2,7 +2,7 @@
 name = "engine"
 version = "0.0.1"
 dependencies = [
- "byteorder 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "geom 0.1.0",
  "gl 0.1.0 (git+https://github.com/bjz/gl-rs)",
  "glfw 0.1.1 (git+https://github.com/bjz/glfw-rs.git)",
  "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -36,6 +36,15 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "geom"
+version = "0.1.0"
+dependencies = [
+ "byteorder 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "math 0.1.0",
+ "num 0.1.0",
 ]
 
 [[package]]

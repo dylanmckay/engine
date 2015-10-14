@@ -1,0 +1,13 @@
+[package]
+name = "geom"
+version = "0.1.0"
+authors = ["Dylan McKay <dylanmckay34@gmail.com>"]
+
+[dependencies.num]
+path = "../num"
+
+[dependencies.math]
+path = "../math"
+
+[dependencies]
+byteorder = "0.3"

@@ -1,5 +1,5 @@
 
-use geom::Vertex;
+use Vertex;
 use std;
 
 #[derive(Copy,Clone,Debug)]

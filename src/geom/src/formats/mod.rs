@@ -1,7 +1,7 @@
 
 pub use self::wavefront::Wavefront;
 
-use geom::mesh;
+use mesh;
 use std::io;
 
 pub mod wavefront;

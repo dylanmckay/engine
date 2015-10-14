@@ -1,9 +1,9 @@
 
-use geom;
+use Face;
 use std;
 
 /// A face triangulator.
-pub struct Triangulate<F: geom::Face> {
+pub struct Triangulate<F: Face> {
     face: F,
     cur_idx: u16,
 
@@ -18,7 +18,7 @@ pub struct Triangulate<F: geom::Face> {
 /// it is converted into a set of faces which are triangular.
 pub fn triangulate<V,F>(face: F) -> Triangulate<F>
     where V: Copy + Clone,
-          F: geom::Face<Vertex=V> + std::iter::FromIterator<V> {
+          F: Face<Vertex=V> + std::iter::FromIterator<V> {
 
     Triangulate {
         vert_count: face.vertices().count() as u16,
@@ -30,7 +30,7 @@ pub fn triangulate<V,F>(face: F) -> Triangulate<F>
 
 impl<V,F> Iterator for Triangulate<F>
     where V: Copy + Clone,
-          F: geom::Face<Vertex=V> + std::iter::FromIterator<V>
+          F: Face<Vertex=V> + std::iter::FromIterator<V>
 {
     type Item = F;
 

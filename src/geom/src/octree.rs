@@ -1,5 +1,5 @@
 
-use geom::{Vertex,Triangle,Aabb};
+use {Vertex,Triangle,Aabb};
 
 const DEFAULT_THRESHOLD: usize = 40;
 const MAXIMUM_DEPTH: usize = 12;

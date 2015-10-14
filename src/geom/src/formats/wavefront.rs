@@ -1,6 +1,6 @@
 
 use math::{Scalar,Vector3};
-use geom::{self,mesh,util,Format};
+use {mesh,util,Format};
 use num;
 
 use std::io;
@@ -17,7 +17,7 @@ pub struct Vertex
 
 pub type Face = Vec<(i32,i32,i32)>;
 
-impl geom::Vertex for Vertex
+impl ::Vertex for Vertex
 {
     type T = Scalar;
 
@@ -137,7 +137,7 @@ impl<I,V> Format<I,V> for Wavefront
 
         for face in faces {
             for triangulated_face in util::triangulate(face) {
-                use geom::Face;
+                use ::Face;
 
                 // TODO: triangulate the face
                 // currently we only accept triangular faces
@@ -168,7 +168,7 @@ pub enum Statement {
 pub mod load
 {
     use std::str::FromStr;
-    use geom::formats::wavefront::Statement;
+    use formats::wavefront::Statement;
 
 
     pub fn parse_line(line: &str) -> Statement {

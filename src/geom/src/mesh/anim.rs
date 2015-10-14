@@ -1,7 +1,7 @@
 
+use Transform3;
 use super::Buffer;
 use math::Matrix;
-use geom;
 use std;
 
 /// Animated mesh data.
@@ -38,7 +38,7 @@ pub struct Joint<I,V>
     children: Vec<Joint<I,V>>,
     buffer: Vec<Buffer<I,V>>,
 
-    transform: geom::Transform3,
+    transform: Transform3,
 }
 
 impl<I,V> Joint<I,V>
@@ -49,7 +49,7 @@ impl<I,V> Joint<I,V>
             children: Vec::new(),
             buffer: Vec::new(),
 
-            transform: geom::Transform3::identity(),
+            transform: Transform3::identity(),
         }
     }
 
@@ -74,9 +74,9 @@ impl<I,V> Joint<I,V>
     }
  
     /// Gets the graphics transformation.
-    pub fn transform(&self) -> geom::Transform3 { self.transform }
+    pub fn transform(&self) -> Transform3 { self.transform }
     /// Gets the graphics transformation mutably.
-    pub fn transform_mut(&mut self) -> &mut geom::Transform3 {
+    pub fn transform_mut(&mut self) -> &mut Transform3 {
         &mut self.transform
     }
 }
