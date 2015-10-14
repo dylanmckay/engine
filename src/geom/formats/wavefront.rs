@@ -40,9 +40,9 @@ impl Vertex
 }
 
 // Gets the position of a vertex
-impl<T: num::Num> From<Vertex> for Vector3<T> {
-    fn from(vert: Vertex) -> Vector3<T> {
-        vert.position.cast()
+impl From<Vertex> for Vector3 {
+    fn from(vert: Vertex) -> Vector3 {
+        vert.position
     }
 }
 
