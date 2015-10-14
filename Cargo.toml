@@ -4,12 +4,6 @@ name = "engine"
 version = "0.0.1"
 authors = ["Dylan McKay <dylanmckay34@gmail.com"]
 
-[dependencies.glfw]
-git = "https://github.com/bjz/glfw-rs.git"
-
-[dependencies.gl]
-git = "https://github.com/bjz/gl-rs"
-
 [dependencies.num]
 path = "src/num"
 
@@ -22,9 +16,9 @@ path = "src/geom"
 [dependencies.color]
 path = "src/color"
 
+[dependencies.gfx]
+path = "src/gfx"
+
 [dependencies.util]
 path = "src/util"
-
-[dependencies]
-libc = "*"
 

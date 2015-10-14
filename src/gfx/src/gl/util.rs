@@ -1,7 +1,6 @@
 
-use gfx;
-use gfx::gl::gl;
-use gfx::gl::gl::types::*;
+use gl::gl;
+use gl::gl::types::*;
 use std::mem;
 
 
@@ -53,10 +52,10 @@ impl_types! {
 }
 
 /// Gets the culling mode `GLenum`.
-pub fn culling_mode(mode: gfx::CullingMode) -> GLenum
+pub fn culling_mode(mode: ::CullingMode) -> GLenum
 {
     match mode {
-        gfx::CullingMode::Front => gl::FRONT,
-        gfx::CullingMode::Back => gl::BACK,
+        ::CullingMode::Front => gl::FRONT,
+        ::CullingMode::Back => gl::BACK,
     }
 }

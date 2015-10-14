@@ -2,7 +2,7 @@
 pub use self::glfw::Backend as Glfw;
 pub mod glfw;
 
-use gfx::input::Event;
+use input::Event;
 
 pub fn default() -> Glfw {
     Glfw::new()

@@ -1,5 +1,5 @@
-use gfx::gl::gl::types::*;
-use gfx::gl::Type;
+use gl::gl::types::*;
+use gl::Type;
 use math;
 use num;
 

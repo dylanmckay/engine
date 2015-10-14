@@ -1,8 +1,7 @@
 
-use gfx;
-use gfx::gl::Viewport;
-use gfx::gl::gl;
-use gfx::gl::gl::types::*;
+use libgl;
+use gl::{self,Viewport,Program};
+use libgl::types::*;
 use color::NormalizedRGBA;
 use libc::c_void;
 use std::ptr;
@@ -22,18 +21,18 @@ impl Canvas
 
     pub fn set_background(&mut self, NormalizedRGBA(r,g,b,a): NormalizedRGBA) {
         unsafe {
-            gl::ClearColor(r,g,b,a)
+            libgl::ClearColor(r,g,b,a)
         }
     }
 
     pub fn clear(&self) {
         self.pre_render();
         unsafe {
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            libgl::Clear(libgl::COLOR_BUFFER_BIT);
         }
     }
 
-    pub fn draw_mesh(&self, mesh: &gfx::gl::mesh::Data, program: &gfx::gl::Program) {
+    pub fn draw_mesh(&self, mesh: &gl::mesh::Data, program: &Program) {
 
         self.pre_render();
         program.enable();
@@ -58,21 +57,21 @@ impl Canvas
 
 
                     // Tell OpenGL about the current piece of the vertex.
-                    gl::EnableVertexAttribArray(i as GLuint);
-                    gl::VertexAttribPointer(i as GLuint, component_count as GLint,
+                    libgl::EnableVertexAttribArray(i as GLuint);
+                    libgl::VertexAttribPointer(i as GLuint, component_count as GLint,
                                             format.component_type,
-                                            gl::FALSE, vertex_size, cur_piece_offset as *const c_void);
+                                            libgl::FALSE, vertex_size, cur_piece_offset as *const c_void);
 
                     cur_piece_offset += piece_size;
                 }
 
-                gl::DrawElements(gl::TRIANGLES, buffer.index_count() as GLint,
+                libgl::DrawElements(libgl::TRIANGLES, buffer.index_count() as GLint,
                                  buffer.index_type(), ptr::null());
 
 
                 // disable the arrays
                 for i in 0..buffer.formats.len() {
-                    gl::DisableVertexAttribArray(i as GLuint);
+                    libgl::DisableVertexAttribArray(i as GLuint);
                 }
             }
 
@@ -84,18 +83,18 @@ impl Canvas
     }
 
     fn pre_render(&self) {
-        use gfx::Viewport;
+        use Viewport;
 
         let (x,y) = self.viewport.top_left();
         let (width,height) = self.viewport.dimensions();
         unsafe {
-            gl::Viewport(x as i32, y as i32,
+            libgl::Viewport(x as i32, y as i32,
                          width as i32, height as i32);
 
             // TODO: Move this call somewhere more suitable
-            gl::Enable(gl::SCISSOR_TEST);
+            libgl::Enable(libgl::SCISSOR_TEST);
 
-            gl::Scissor(x as i32, y as i32,
+            libgl::Scissor(x as i32, y as i32,
                         width as i32, height as i32);
         }
     }

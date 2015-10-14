@@ -1,11 +1,20 @@
 
+#![feature(concat_idents)]
+
+extern crate num;
+extern crate math;
+extern crate color;
+extern crate geom;
+
+extern crate gl as libgl;
+extern crate libc;
+
 pub mod input;
 
 pub mod gl;
 pub mod util;
 
-use num::{self,Num};
-use math;
+use num::Num;
 
 /// A rectangular region of the screen.
 pub trait Viewport<T: Num> : Sized + Clone

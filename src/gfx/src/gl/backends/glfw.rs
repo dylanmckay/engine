@@ -1,9 +1,8 @@
 
 extern crate glfw;
 
-use gfx;
-use gfx::gl;
-use gfx::input::Event;
+use gl;
+use input::Event;
 
 use std::sync::mpsc::Receiver;
 
@@ -28,7 +27,7 @@ impl Backend
                                                       glfw::WindowMode::Windowed)
                                        .expect("Failed to create GLFW window");
 
-        gfx::gl::gl::load_with(|s| window.get_proc_address(s));
+        gl::gl::load_with(|s| window.get_proc_address(s));
 
         window.set_key_polling(true);
         window.set_mouse_button_polling(true);
@@ -44,7 +43,7 @@ impl Backend
     }
 }
 
-impl gfx::gl::Backend for Backend
+impl gl::Backend for Backend
 {
     fn run(&mut self, events: &mut Vec<Event>) {
         self.glfw.poll_events();
@@ -95,9 +94,8 @@ impl gfx::gl::Backend for Backend
 /// Useful utilities.
 pub mod util
 {
-    use gfx;
     use super::glfw;
-    use gfx::input::{self,Event};
+    use input::{self,Event};
 
     pub fn into_event(event: glfw::WindowEvent,
                       window: &glfw::Window)
@@ -163,7 +161,7 @@ pub mod util
 
     // TODO: implement all keys
     pub fn into_key(key: glfw::Key) -> Option<input::Key> {
-        use gfx::input::{Key,Side};
+        use input::{Key,Side};
 
         match key {
             glfw::Key::Space => Some(Key::Space),
@@ -329,6 +327,6 @@ pub mod util
         let real_point: (f32,f32) = point.cast();
         let dimensions: (f32,f32) = dimensions.cast();
 
-        gfx::util::map_pixel_to_point(real_point, dimensions)
+        ::util::map_pixel_to_point(real_point, dimensions)
     }
 }

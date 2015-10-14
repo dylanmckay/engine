@@ -1,9 +1,9 @@
 
-use gfx::gl::gl;
-use gfx::gl::vertex;
-use gfx::gl::gl::types::*;
-use gfx::gl::Type;
-use gfx::gl::util;
+use gl::gl;
+use gl::vertex;
+use gl::gl::types::*;
+use gl::Type;
+use gl::util;
 use geom;
 use libc::c_void;
 use std::{self, mem};

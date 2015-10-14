@@ -1,8 +1,8 @@
 
 pub use self::uniform::Uniform;
 
-use gfx::gl::gl;
-use gfx::gl::gl::types::*;
+use libgl;
+use libgl::types::*;
 use std::{fmt,ptr,mem,ffi};
 
 #[derive(Copy,Clone)]
@@ -16,8 +16,8 @@ impl Kind
 {
     pub fn into_gl(self) -> GLenum {
         match self {
-            Kind::Vertex => gl::VERTEX_SHADER,
-            Kind::Fragment => gl::FRAGMENT_SHADER,
+            Kind::Vertex => libgl::VERTEX_SHADER,
+            Kind::Fragment => libgl::FRAGMENT_SHADER,
         }
     }
 }
@@ -60,20 +60,20 @@ impl Shader
     /// Compiles a shader.
     /// `src` - A null terminated buffer containing the shader source.
     pub unsafe fn compile_raw(kind: GLenum, src: *const *const GLchar) -> Result<Self,String> {
-        let shader: GLuint = gl::CreateShader(kind);
+        let shader: GLuint = libgl::CreateShader(kind);
 
-        gl::ShaderSource(shader, 1, src, ptr::null());
+        libgl::ShaderSource(shader, 1, src, ptr::null());
 
-        gl::CompileShader(shader);
+        libgl::CompileShader(shader);
 
         let mut status: GLint = mem::uninitialized();
-        gl::GetShaderiv(shader, gl::COMPILE_STATUS, &mut status);
+        libgl::GetShaderiv(shader, libgl::COMPILE_STATUS, &mut status);
 
-        if status == gl::TRUE as GLint {
+        if status == libgl::TRUE as GLint {
             Ok(Shader::from_raw(shader))
         } else { // an error occured while compiling
             let mut log_length: GLint = mem::uninitialized();
-            gl::GetShaderiv(shader, gl::INFO_LOG_LENGTH, &mut log_length);
+            libgl::GetShaderiv(shader, libgl::INFO_LOG_LENGTH, &mut log_length);
 
             // make sure the log length is at least one byte
             assert!(log_length > 0);
@@ -83,7 +83,7 @@ impl Shader
             log_buf.set_len(log_length as usize);
 
             // copy the compile log into the buffer
-            gl::GetShaderInfoLog(shader, log_length,
+            libgl::GetShaderInfoLog(shader, log_length,
                                  ptr::null_mut(), log_buf.as_mut_ptr() as *mut GLchar);
 
             let s = String::from_utf8(log_buf).unwrap();
@@ -118,26 +118,26 @@ impl Program
 
     pub unsafe fn link_raw(shaders: &[GLuint]) -> Result<Self,String> {
 
-        let program: GLuint = gl::CreateProgram();
+        let program: GLuint = libgl::CreateProgram();
 
         for &shader in shaders.iter() {
-            gl::AttachShader(program, shader);
+            libgl::AttachShader(program, shader);
         }
 
-        gl::LinkProgram(program);
+        libgl::LinkProgram(program);
 
         for &shader in shaders.iter() {
-            gl::DetachShader(program, shader);
+            libgl::DetachShader(program, shader);
         }
 
         let mut status = mem::uninitialized();
-        gl::GetProgramiv(program, gl::LINK_STATUS, &mut status);
+        libgl::GetProgramiv(program, libgl::LINK_STATUS, &mut status);
 
-        if status == gl::TRUE as GLint {
+        if status == libgl::TRUE as GLint {
             Ok(Program::from_raw(program))
         } else { // failed to link
             let mut log_length: GLint = mem::uninitialized();
-            gl::GetProgramiv(program, gl::INFO_LOG_LENGTH, &mut log_length);
+            libgl::GetProgramiv(program, libgl::INFO_LOG_LENGTH, &mut log_length);
 
             // make sure the log length is at least one byte
             assert!(log_length > 0);
@@ -145,7 +145,7 @@ impl Program
             let mut log_buf: Vec<u8> = Vec::with_capacity(log_length as usize);
             log_buf.set_len(log_length as usize);
 
-            gl::GetProgramInfoLog(program, log_length,
+            libgl::GetProgramInfoLog(program, log_length,
                                   ptr::null_mut(), log_buf.as_mut_ptr() as *mut GLchar);
 
             let s = String::from_utf8(log_buf).unwrap();
@@ -157,7 +157,7 @@ impl Program
         let src_buf = ffi::CString::new(name).unwrap();
 
         let location = unsafe {
-            gl::GetUniformLocation(self.program, src_buf.as_ptr())
+            libgl::GetUniformLocation(self.program, src_buf.as_ptr())
         };
 
         unsafe {
@@ -167,13 +167,13 @@ impl Program
 
     pub fn enable(&self) {
         unsafe {
-            gl::UseProgram(self.program);
+            libgl::UseProgram(self.program);
         }
     }
 
     pub fn disable(&self) {
         unsafe {
-            gl::UseProgram(0);
+            libgl::UseProgram(0);
         }
     }
 }
@@ -181,9 +181,9 @@ impl Program
 pub mod uniform
 {
     use math;
-    use gfx::gl::Program;
-    use gfx::gl::gl::types::*;
-    use gfx::gl::gl::*;
+    use gl::Program;
+    use libgl::types::*;
+    use libgl::*;
 
     /// An OpenGL shader uniform.
     pub struct Uniform<'a> {

@@ -4,9 +4,7 @@ version = "0.0.1"
 dependencies = [
  "color 0.1.0",
  "geom 0.1.0",
- "gl 0.1.0 (git+https://github.com/bjz/gl-rs)",
- "glfw 0.1.1 (git+https://github.com/bjz/glfw-rs.git)",
- "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gfx 0.1.0",
  "math 0.1.0",
  "num 0.1.0",
  "util 0.1.0",
@@ -51,6 +49,19 @@ name = "geom"
 version = "0.1.0"
 dependencies = [
  "byteorder 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "math 0.1.0",
+ "num 0.1.0",
+]
+
+[[package]]
+name = "gfx"
+version = "0.1.0"
+dependencies = [
+ "color 0.1.0",
+ "geom 0.1.0",
+ "gl 0.1.0 (git+https://github.com/bjz/gl-rs)",
+ "glfw 0.1.1 (git+https://github.com/bjz/glfw-rs.git)",
+ "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "math 0.1.0",
  "num 0.1.0",
 ]

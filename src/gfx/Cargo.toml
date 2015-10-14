@@ -1,0 +1,25 @@
+[package]
+name = "gfx"
+version = "0.1.0"
+authors = ["Dylan McKay <dylanmckay34@gmail.com>"]
+
+[dependencies.glfw]
+git = "https://github.com/bjz/glfw-rs.git"
+
+[dependencies.gl]
+git = "https://github.com/bjz/gl-rs"
+
+[dependencies.num]
+path = "../num"
+
+[dependencies.math]
+path = "../math"
+
+[dependencies.geom]
+path = "../geom"
+
+[dependencies.color]
+path = "../color"
+
+[dependencies]
+libc = "*"

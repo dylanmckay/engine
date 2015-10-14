@@ -1,6 +1,6 @@
 
-use gfx::{self,gl,util};
-use gfx::input::{self,Event};
+use {gl,util,CullingMode};
+use input::{self,Event};
 use libgl;
 use geom;
 
@@ -39,7 +39,7 @@ impl<B: gl::Backend> Device<B>
     }
 
     pub fn begin(&self) -> gl::Canvas {
-        use gfx::Viewport;
+        use Viewport;
         self.area().begin()
     }
 
@@ -49,7 +49,7 @@ impl<B: gl::Backend> Device<B>
 
     /// Gets the viewport containing the entire area.
     pub fn area(&self) -> gl::Viewport {
-        use gfx::Viewport;
+        use Viewport;
 
         let (width,height) = self.dimensions();
         let half_extents = (width/2,height/2);
@@ -80,7 +80,7 @@ impl<B: gl::Backend> Device<B>
 
     /// Sets the culling mode.
     /// This enables culling if it is disabled.
-    pub fn set_culling_mode(&mut self, mode: gfx::CullingMode) {
+    pub fn set_culling_mode(&mut self, mode: CullingMode) {
         let mode_enum = gl::util::culling_mode(mode);
 
         self.enable_culling();

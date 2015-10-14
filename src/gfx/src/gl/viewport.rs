@@ -1,6 +1,5 @@
 
-use gfx;
-use gfx::gl;
+use gl;
 
 /// A rectangular portion of the screen.
 #[derive(Clone,Eq,PartialEq,Debug)]
@@ -10,7 +9,7 @@ pub struct Viewport
     half_extents: (u32,u32),
 }
 
-impl gfx::Viewport<u32> for Viewport
+impl ::Viewport<u32> for Viewport
 {
     type Canvas = gl::Canvas;
 

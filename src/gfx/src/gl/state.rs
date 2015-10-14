@@ -2,7 +2,7 @@
 
 pub mod properties
 {
-    use gfx::gl::gl;
+    use gl::gl;
     use color::NormalizedRGBA;
 
     pub trait Property<T> : Copy {
