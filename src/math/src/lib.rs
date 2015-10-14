@@ -1,4 +1,6 @@
 
+extern crate num;
+
 pub mod vector;
 pub mod vector2;
 pub mod vector3;

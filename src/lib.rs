@@ -7,8 +7,8 @@ extern crate byteorder;
 extern crate gl as libgl;
 
 extern crate num;
+extern crate math;
 
-pub mod math;
 pub mod color;
 pub mod geom;
 pub mod gfx;

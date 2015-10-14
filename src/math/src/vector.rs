@@ -1,5 +1,5 @@
 
-use math::util;
+use util;
 use num::{Num,Decimal};
 use std;
 

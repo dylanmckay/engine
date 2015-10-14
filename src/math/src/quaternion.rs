@@ -1,12 +1,12 @@
 
-use math;
+use {Scalar,Vector3,Matrix3};
 use num::Decimal;
 use std;
 
 /// A quaternion.
 /// The quaternion is of the form `(x,y,z,w)`.
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
-pub struct Quaternion<T: Decimal = math::Scalar>(pub T, pub T, pub T, pub T);
+pub struct Quaternion<T: Decimal = Scalar>(pub T, pub T, pub T, pub T);
 
 impl<T: Decimal> Quaternion<T>
 {
@@ -14,7 +14,7 @@ impl<T: Decimal> Quaternion<T>
         Quaternion(T::zero(), T::zero(), T::zero(), T::one())
     }
 
-    pub fn from_euler_radians(euler: math::Vector3<T>) -> Self {
+    pub fn from_euler_radians(euler: Vector3<T>) -> Self {
         let half_euler = euler * (T::one()/(T::one()+T::one()));
         let (ex,ey,ez) = half_euler.into();
 
@@ -79,7 +79,7 @@ impl<T: Decimal> Quaternion<T>
         self.map(|a| a*inverse_len)
     }
 
-    pub fn as_rotation_matrix(self) -> math::Matrix3<T> {
+    pub fn as_rotation_matrix(self) -> Matrix3<T> {
         let Quaternion(x,y,z,w) = self;
         let Quaternion(x2,y2,z2,_) = self.map(|a|a*a);
 
@@ -98,7 +98,7 @@ impl<T: Decimal> Quaternion<T>
         let m32 = two*y*z + two*x*w;
         let m33 = one - two*x2 - two*y2;
 
-        math::Matrix3::new(m11, m12, m13,
+        Matrix3::new(m11, m12, m13,
                            m21, m22, m23,
                            m31, m32, m33)
 

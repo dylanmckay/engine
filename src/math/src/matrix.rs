@@ -1,5 +1,5 @@
 
-use math;
+use util;
 use num::Num;
 
 /// A matrix.
@@ -9,7 +9,7 @@ pub trait Matrix<T: Num> : Sized + Copy + Clone
     /// Gets the identity matrix.
     // TODO: Make this an associated constant.
     fn identity() -> Self {
-        Self::from_fn(math::util::kronecker_delta)
+        Self::from_fn(util::kronecker_delta)
     }
 
     /// Creates a matrix from a function taking row and column numbers.
@@ -32,7 +32,7 @@ pub trait Matrix<T: Num> : Sized + Copy + Clone
 }
 
 pub mod row {
-    use math::Matrix;
+    use Matrix;
     use std;
 
     /// A row in a matrix.

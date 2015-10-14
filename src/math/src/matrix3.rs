@@ -1,5 +1,5 @@
 
-use math::{self,Matrix};
+use {matrix,Matrix,Vector3};
 use num::Num;
 use std;
 
@@ -47,12 +47,12 @@ impl<T: Num> Matrix<T> for Matrix3<T>
         self.m[calculate_index(row as usize, col as usize)] = val;
     }
 
-    fn row<'a>(&'a self, num: usize) -> math::matrix::row::Row<'a,T> {
-        math::matrix::row::Row::new(&self.m, num, 3)
+    fn row<'a>(&'a self, num: usize) -> matrix::row::Row<'a,T> {
+        matrix::row::Row::new(&self.m, num, 3)
     }
 
-    fn col<'a>(&'a self, num: usize) -> math::matrix::column::Column<'a,T> {
-        math::matrix::column::Column::new(&self.m, num, 3, 3)
+    fn col<'a>(&'a self, num: usize) -> matrix::column::Column<'a,T> {
+        matrix::column::Column::new(&self.m, num, 3, 3)
     }
 
     fn as_slice<'a>(&'a self)-> &'a [T] { &self.m }
@@ -89,18 +89,18 @@ impl<T: Num> std::ops::Mul for Matrix3<T>
     }
 }
 
-impl<T: Num> std::ops::Mul<Matrix3<T>> for math::Vector3<T>
+impl<T: Num> std::ops::Mul<Matrix3<T>> for Vector3<T>
 {
-    type Output = math::Vector3<T>;
+    type Output = Vector3<T>;
 
-    fn mul(self, m: Matrix3<T>) -> math::Vector3<T> {
+    fn mul(self, m: Matrix3<T>) -> Vector3<T> {
         let (x,y,z) = self.into();
 
         let xdash = x*m[(0,0)] + y*m[(1,0)] + z*m[(2,0)];
         let ydash = x*m[(0,1)] + y*m[(1,1)] + z*m[(2,1)];
         let zdash = x*m[(0,2)] + y*m[(1,2)] + z*m[(2,2)];
 
-        math::Vector3(xdash, ydash, zdash)
+        Vector3(xdash, ydash, zdash)
     }
 }
 

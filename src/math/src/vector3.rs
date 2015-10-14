@@ -1,7 +1,7 @@
 use std;
 use std::ops;
 use num::{self,Num};
-use math::{util,Scalar};
+use {util,Scalar};
 
 #[repr(C)]
 #[derive(Copy,Clone)]

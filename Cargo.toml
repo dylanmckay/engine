@@ -13,6 +13,9 @@ git = "https://github.com/bjz/gl-rs"
 [dependencies.num]
 path = "src/num"
 
+[dependencies.math]
+path = "src/math"
+
 [dependencies]
 libc = "*"
 time = "*"
