@@ -93,14 +93,6 @@ pub trait Decimal : Num
 /// A number which can be positive or negative.
 pub trait Signed: Neg<Output=Self> + Sized
 {
-    // moved into seperate trait, to work around the
-    // difficulties of trait bounds
-    //fn abs(self) -> Self;
-}
-
-pub trait Abs
-{
-    fn abs(self) -> Self;
 }
 
 /// A number which does not have a sign.
@@ -111,9 +103,9 @@ pub trait Num : Copy + Clone + Zero + One + Bounded +
                 Add<Output=Self> + Sub<Output=Self> +
                 Mul<Output=Self> + Div<Output=Self> +
                 Rem<Output=Self> + PartialEq + NumCast +
-                PartialOrd + Abs
+                PartialOrd
 {
-
+    fn abs(self) -> Self;
 }
 
 /// A number which has an upper and lower bound.
@@ -247,10 +239,9 @@ macro_rules! impl_signed {
     ($ty:ident, $t:ident) => {
         impl Signed for $ty { }
 
-        impl Abs for $ty
+        impl Num for $ty
         {
-            fn abs(self) -> $ty {
-
+            fn abs(self) -> Self {
                 $ty::abs(self)
             }
         }
@@ -262,20 +253,12 @@ macro_rules! impl_unsigned {
     ($ty:ident) => {
         impl Unsigned for $ty { }
 
-        impl Abs for $ty
+        impl Num for $ty
         {
             fn abs(self) -> $ty {
                 self
             }
         }
-    }
-}
-
-/// Implements the `Num` trait on a type.
-macro_rules! impl_num {
-    ($ty:ident) => {
-    
-        impl Num for $ty { }
     }
 }
 
@@ -358,24 +341,6 @@ impl_unsigned!(u16);
 impl_unsigned!(u32);
 impl_unsigned!(u64);
 impl_unsigned!(usize);
-
-// implement Num for unsigned integral types
-impl_num!(u8);
-impl_num!(u16);
-impl_num!(u32);
-impl_num!(u64);
-impl_num!(usize);
-
-// implement Num for signed integral types
-impl_num!(i8);
-impl_num!(i16);
-impl_num!(i32);
-impl_num!(i64);
-impl_num!(isize);
-
-// implement Num for floating point types
-impl_num!(f32);
-impl_num!(f64);
 
 // implement Bounded for unsigned integral types
 impl_bounded!(u8,    std::u8::MIN,    std::u8::MAX);
