@@ -2,6 +2,7 @@
 name = "engine"
 version = "0.0.1"
 dependencies = [
+ "color 0.1.0",
  "geom 0.1.0",
  "gl 0.1.0 (git+https://github.com/bjz/gl-rs)",
  "glfw 0.1.1 (git+https://github.com/bjz/glfw-rs.git)",
@@ -29,6 +30,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "byteorder"
 version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "color"
+version = "0.1.0"
+dependencies = [
+ "num 0.1.0",
+]
 
 [[package]]
 name = "enum_primitive"

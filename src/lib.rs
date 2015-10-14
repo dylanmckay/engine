@@ -9,7 +9,7 @@ extern crate num;
 extern crate math;
 extern crate geom;
 extern crate util;
+extern crate color;
 
-pub mod color;
 pub mod gfx;
 

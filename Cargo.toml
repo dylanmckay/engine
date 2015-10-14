@@ -19,6 +19,9 @@ path = "src/math"
 [dependencies.geom]
 path = "src/geom"
 
+[dependencies.color]
+path = "src/color"
+
 [dependencies.util]
 path = "src/util"
 

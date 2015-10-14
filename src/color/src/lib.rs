@@ -1,5 +1,5 @@
 
-use num;
+extern crate num;
 
 pub trait Color : Copy + Clone { }
 
