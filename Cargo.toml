@@ -22,3 +22,6 @@ path = "src/gfx"
 [dependencies.util]
 path = "src/util"
 
+[[example]]
+name = "basic"
+path = "examples/basic/main.rs"

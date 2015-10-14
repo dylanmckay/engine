@@ -1,20 +1,14 @@
 
-#![feature(float_extras,concat_idents)]
-
-extern crate libc;
-extern crate gl as libgl;
-
-pub mod num;
-pub mod math;
-pub mod color;
-pub mod geom;
-pub mod gfx;
-pub mod util;
+extern crate gfx;
+extern crate geom;
+extern crate color;
+extern crate math;
+extern crate util;
 
 const BACKGROUND: color::NormalizedRGBA = color::NormalizedRGBA(0.46,0.62,0.8,1.0);
-const MODEL_DATA: &'static str = include_str!("../res/unit_cube.obj");
-const VERTEX_SHADER: &'static str = include_str!("../res/vertex.glsl");
-const FRAGMENT_SHADER: &'static str = include_str!("../res/fragment.glsl");
+const MODEL_DATA: &'static str = include_str!("../../res/unit_cube.obj");
+const VERTEX_SHADER: &'static str = include_str!("../../res/vertex.glsl");
+const FRAGMENT_SHADER: &'static str = include_str!("../../res/fragment.glsl");
 
 const BLOCK_SIZE: f32 = 0.5;
 // number of units to move in a second
@@ -138,7 +132,7 @@ impl Context
         use std;
 
         let mesh_cursor = std::io::Cursor::new(MODEL_DATA.as_bytes());
-        let mesh_data: geom::mesh::Data<Index,Vertex> = geom::formats::Wavefront::load(mesh_cursor);
+        let mesh_data: geom::mesh::StaticData<Index,Vertex> = geom::formats::Wavefront::load(mesh_cursor);
 
         let backend = gfx::gl::backends::glfw::Backend::new();
         let mut device = gfx::gl::Device::new(backend);

@@ -181,6 +181,7 @@ impl Program
 pub mod uniform
 {
     use math;
+    use geom;
     use gl::Program;
     use libgl::types::*;
     use libgl::*;
@@ -288,6 +289,13 @@ pub mod uniform
             use math::Matrix;
             let data = mat.as_slice();
             unsafe { UniformMatrix4fv(loc, 1, TRUE, data.as_ptr()) }
+        }
+    }
+
+    impl Type for geom::Transform3<f32> {
+        fn set(loc: GLint, trans: geom::Transform3<f32>) {
+            let mat: math::Matrix4<_> = trans.into();
+            Type::set(loc, mat);
         }
     }
 }

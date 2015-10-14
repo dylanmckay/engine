@@ -181,3 +181,27 @@ impl<T: Num+Decimal> Transform3<T>
     }
 }
 
+impl<T: Num+Decimal+num::Signed> From<Vector3<T>> for Rotation3<T>
+{
+    fn from(vec: Vector3<T>) -> Rotation3<T> {
+        Rotation3::from_vector(vec)
+    }
+}
+
+impl<T: Num> Into<Matrix4<T>> for Transform3<T>
+{
+    fn into(self) -> Matrix4<T> {
+        self.matrix
+    }
+}
+
+impl<T: Num+Decimal> std::ops::Mul for Transform3<T>
+{
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        Transform3::from_matrix(self.matrix * rhs.matrix)
+    }
+}
+
+
