@@ -6,6 +6,7 @@ dependencies = [
  "gl 0.1.0 (git+https://github.com/bjz/gl-rs)",
  "glfw 0.1.1 (git+https://github.com/bjz/glfw-rs.git)",
  "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.0",
  "time 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -110,6 +111,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "num"
+version = "0.1.0"
 
 [[package]]
 name = "num"

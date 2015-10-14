@@ -1,5 +1,6 @@
 
-use std;
+#![feature(float_extras)]
+
 use std::ops::{Add,Sub,Mul,Div,Neg,Rem};
 
 pub trait Cast<T>
