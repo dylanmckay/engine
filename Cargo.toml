@@ -19,7 +19,9 @@ path = "src/math"
 [dependencies.geom]
 path = "src/geom"
 
+[dependencies.util]
+path = "src/util"
+
 [dependencies]
 libc = "*"
-time = "*"
 
