@@ -13,3 +13,4 @@ git = "https://github.com/bjz/gl-rs"
 [dependencies]
 libc = "*"
 time = "*"
+byteorder = "0.3"

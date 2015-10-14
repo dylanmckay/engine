@@ -5,6 +5,7 @@ use geom::mesh;
 use std::io;
 
 pub mod wavefront;
+pub mod tds;
 
 /// A generic geometry format.
 pub trait Format<I, V>
