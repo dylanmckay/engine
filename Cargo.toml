@@ -19,6 +19,9 @@ path = "src/color"
 [dependencies.gfx]
 path = "src/gfx"
 
+[dependencies.net]
+path = "src/net"
+
 [dependencies.util]
 path = "src/util"
 
