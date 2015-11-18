@@ -27,7 +27,7 @@ impl Backend
                                                       glfw::WindowMode::Windowed)
                                        .expect("Failed to create GLFW window");
 
-        gl::gl::load_with(|s| window.get_proc_address(s));
+        gl::gl::load_with(|s| window.get_proc_address(s) as *const ());
 
         window.set_key_polling(true);
         window.set_mouse_button_polling(true);
